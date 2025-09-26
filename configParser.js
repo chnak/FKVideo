@@ -15,6 +15,7 @@ export class ConfigParser {
     this.config = config;
     this.canvasWidth = config.width||1280;
     this.canvasHeight = config.height||720;
+    this.tmpDir = config.tmpDir;
     this.elementTypes = {
       video: VideoElement,
       image: ImageElement,
@@ -49,6 +50,7 @@ export class ConfigParser {
       canvasWidth: this.canvasWidth,
       canvasHeight: this.canvasHeight,
       fps: this.config.fps,
+      tmpDir:  this.tmpDir,
       transitions: this.config.transitions || []
     };
   }
@@ -76,6 +78,7 @@ export class ConfigParser {
       endTime,
       canvasWidth: this.canvasWidth,
       canvasHeight: this.canvasHeight,
+      tmpDir: this.tmpDir,
       fps: this.config.fps
     });
 

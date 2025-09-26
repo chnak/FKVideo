@@ -2,7 +2,8 @@ import EventEmitter from "events";
 import { VideoRenderer } from "./renderer.js";
 import { ConfigParser } from "./configParser.js";
 import { Timeline } from "./timeline.js";
-
+import { dirname, join } from "path";
+import { nanoid } from "nanoid";
 /**
  * 基于 Creatomate 配置结构的视频制作库
  * 结合 editly 的帧渲染机制
@@ -24,7 +25,7 @@ export class VideoMaker extends EventEmitter {
       fast: config.fast || false,
       outPath: config.outPath || 'output.mp4',
       playbackSpeed: config.playbackSpeed || 1.0, // 倍速播放，默认1.0倍速
-      
+      tmpDir: null,
       // Creatomate 风格的元素配置
       elements: config.elements || [],
       
@@ -42,7 +43,7 @@ export class VideoMaker extends EventEmitter {
         ...config.defaults
       }
     };
-    
+    this.config.tmpDir=join(dirname(this.config.outPath), `video-maker-tmp-${nanoid()}`),
     this.timeline = null;
     this.renderer = null;
   }

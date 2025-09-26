@@ -6,16 +6,26 @@ const videoMaker = new VideoMaker({
   height: 1080,
   fps: 30,
   elements: [
+    // {
+    //   type: "shape",
+    //   shape: "rect",
+    //   width: '100%',
+    //   height: '100%',
+    //   x: '50%',
+    //   y: '50%',
+    //   fillColor: "#3498db",
+    //   duration: 5,
+    //   startTime: 0
+    // },
     {
-      type: "shape",
-      shape: "rect",
-      width: '100%',
-      height: '100%',
+      type: "image",
+      src: "https://element.eleme.io/static/theme-index-blue.c38b733.png",
+      duration: 5,
       x: '50%',
       y: '50%',
-      fillColor: "#3498db",
-      duration: 5,
-      startTime: 0
+      width: '100%',
+      height: '100%',
+      fit: "cover"
     },
     {
       type: "text",

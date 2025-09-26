@@ -10,10 +10,11 @@ import fsExtra from "fs-extra";
 export class VideoRenderer {
   constructor(config) {
     this.config = config;
-    this.tmpDir = join(dirname(config.outPath), `video-maker-tmp-${nanoid()}`);
+    this.tmpDir = config.tmpDir||join(dirname(config.outPath), `video-maker-tmp-${nanoid()}`);
     this.ffmpegProcess = null;
     this.mixedAudioPath = null; // 用于存储混合后的音频文件路径
     this.playbackSpeed = config.playbackSpeed || 1.0; // 倍速播放，默认1.0倍速
+    config.tmpDir=this.tmpDir;
   }
 
   /**
@@ -26,7 +27,7 @@ export class VideoRenderer {
       const totalFrames = Math.ceil(timeline.duration * timeline.fps);
       const frameSize = timeline.canvasWidth * timeline.canvasHeight * 4; // RGBA
       const outputFps = timeline.fps * this.playbackSpeed; // 输出帧率 = 原始帧率 × 倍速
-
+      timeline.tmpDir = this.tmpDir;
       //  console.log(`开始渲染: ${timeline.canvasWidth}x${timeline.canvasHeight} ${timeline.fps}fps → ${outputFps.toFixed(2)}fps (${this.playbackSpeed}x倍速), 总帧数: ${totalFrames}`);
       
       // 检查是否有音频元素

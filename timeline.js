@@ -14,6 +14,7 @@ export class Timeline {
     this.canvasHeight = parsedConfig.canvasHeight;
     this.fps = parsedConfig.fps;
     this.globalConfig = globalConfig;
+    this.tmpDir = null;
     
     // 处理过渡效果配置
     this.transitions = this.processTransitions(parsedConfig.transitions || []);

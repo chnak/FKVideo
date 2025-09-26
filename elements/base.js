@@ -3,7 +3,7 @@ import { getPositionProps, parsePositionValue } from '../utils/positionUtils.js'
 import { registerFont } from "canvas";
 import { basename, resolve, dirname, extname } from "path";
 import { fileURLToPath } from "url";
-
+import { downloadAndDetect } from '../utils/download.js';
 
 // 缓存已加载的字体
 const loadedFonts = [];
@@ -47,9 +47,11 @@ export class BaseElement {
     this.animations = [];
     this.animationManager = animationManager;
     
+
+    this.tmpDir = config.tmpDir;
     // 处理动画配置
     this.processAnimations(config.animations || []);
-    
+
     // 内部状态
     this.isInitialized = false;
   }
@@ -60,6 +62,23 @@ export class BaseElement {
   async initialize() {
     if (this.isInitialized) return;
     this.isInitialized = true;
+    try{
+      if (this.source && (this.source.startsWith('http'))) {
+        const res=await downloadAndDetect(this.source,this.tmpDir);
+        this.source =res.filePath;
+      }
+      if(this.audio&&(this.audio.startsWith('http'))) {
+        const res = await downloadAndDetect(this.audio,this.tmpDir);
+        this.audio =res.filePath;
+      }
+      if(this.fontPath&&(this.fontPath.startsWith('http'))) {
+        const res = await downloadAndDetect(this.fontPath,this.tmpDir);
+        this.fontPath =res.filePath;
+      }
+    }catch(error){
+      console.error(error);
+    }
+
   }
 
   /**

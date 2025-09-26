@@ -80,7 +80,6 @@ export async function createTextElement(config) {
     height,
     // 音频支持
     audio = null, // 音频文件路径
-    audioSegments = [], // 每段字幕对应的音频配置
     volume = 1.0, // 音量
     fadeIn = 0, // 淡入时间
     fadeOut = 0 // 淡出时间
@@ -104,12 +103,7 @@ export async function createTextElement(config) {
       index,
       startTime: 0,
       duration: item.duration,
-      endTime: 0,
-      // 音频配置
-      audio: audioSegments[index] || null, // 每段字幕对应的音频
-      volume: volume,
-      fadeIn: fadeIn,
-      fadeOut: fadeOut
+      endTime: 0
     };
     data.startTime = totalDuration;
     totalDuration += data.duration;
@@ -141,30 +135,9 @@ export async function createTextElement(config) {
       
       // 添加全局音频元素
       if (globalAudioElement) {
-        // console.log(`[SubtitleProcessor] 添加全局音频元素: ${globalAudioElement.source}`);
         audioElements.push(globalAudioElement);
-      } else {
-        // console.log(`[SubtitleProcessor] 没有全局音频元素`);
       }
-      
-      // 添加分段音频元素
-      for (const segment of textSegments) {
-        if (segment.audio) {
-          // console.log(`[SubtitleProcessor] 添加分段音频元素: ${segment.audio}`);
-          const segmentAudioElement = new AudioElement({
-            type: 'audio',
-            source: segment.audio,
-            volume: segment.volume,
-            fadeIn: segment.fadeIn,
-            fadeOut: segment.fadeOut,
-            startTime: segment.startTime,
-            duration: segment.duration
-          });
-          audioElements.push(segmentAudioElement);
-        }
-      }
-      
-      // console.log(`[SubtitleProcessor] 总共返回 ${audioElements.length} 个音频元素`);
+    
       return audioElements;
     },
 
