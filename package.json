@@ -1,5 +1,5 @@
 {
-  "name": "video-maker",
+  "name": "FKvideo",
   "version": "1.0.0",
   "description": "基于 Creatomate 配置结构的视频制作库，结合 editly 的渲染机制",
   "main": "index.js",
