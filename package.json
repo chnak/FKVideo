@@ -1,14 +1,23 @@
 {
   "name": "FKvideo",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "基于 Creatomate 配置结构的视频制作库，结合 editly 的渲染机制",
-  "main": "index.js",
+  "main": "index.cjs",
+  "module": "index.js",
   "type": "module",
+  "exports": {
+    ".": {
+      "import": "./index.js",
+      "require": "./index.cjs"
+    }
+  },
   "scripts": {
     "start": "node examples/basic-example.js",
     "example:basic": "node examples/basic-example.js",
     "example:advanced": "node examples/advanced-example.js",
     "example:creatomate": "node examples/creatomate-style-example.js",
+    "example:require": "node examples/require-example.js",
+    "test:require": "node test-require.cjs",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
