@@ -715,7 +715,7 @@ export class MultiTrackBuilder {
       duration: config.duration || 5,
       startTime: config.startTime || 0,
       zIndex: config.zIndex || 3,
-      backgroundColor: config.backgroundColor || 'rgba(0,0,0,0.7)',
+      backgroundColor: config.backgroundColor,
       backgroundPadding: config.backgroundPadding || 10,
       backgroundRadius: config.backgroundRadius || 5,
       ...config
