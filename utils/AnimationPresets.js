@@ -1,7 +1,15 @@
 /**
  * 动画预设效果
  * 提供常用的动画效果预设
+ * 包含基础预设和 AnimationManager 预设
  */
+
+import { 
+  AnimationManagerPresets, 
+  getAnimationManagerPreset, 
+  getAnimationManagerPresetNames,
+  isMultiPropertyAnimation as isManagerMultiProperty
+} from './AnimationManagerPresets.js';
 
 export const AnimationPresets = {
   // 淡入淡出效果
@@ -48,8 +56,8 @@ export const AnimationPresets = {
     property: 'scaleX',
     from: 0,
     to: 1,
-    easing: 'bounce',
-    duration: 1.2
+    easing: 'easeInBounce',
+    duration: 1
   },
 
   bounceOut: {
@@ -57,8 +65,8 @@ export const AnimationPresets = {
     property: 'scaleX',
     from: 1,
     to: 0,
-    easing: 'bounce',
-    duration: 1.2
+    easing: 'easeOutBounce',
+    duration: 1
   },
 
   // 滑动效果
@@ -72,9 +80,9 @@ export const AnimationPresets = {
   },
 
   slideInRight: {
-    name: "slideInRight", 
+    name: "slideInRight",
     property: 'x',
-    from: '200%',
+    from: '100%',
     to: '50%',
     easing: 'easeOut',
     duration: 1
@@ -91,46 +99,10 @@ export const AnimationPresets = {
 
   slideInDown: {
     name: "slideInDown",
-    property: 'y', 
+    property: 'y',
     from: '-100%',
     to: '50%',
     easing: 'easeOut',
-    duration: 1
-  },
-
-  slideOutLeft: {
-    name: "slideOutLeft",
-    property: 'x',
-    from: '50%',
-    to: '-100%',
-    easing: 'easeIn',
-    duration: 1
-  },
-
-  slideOutRight: {
-    name: "slideOutRight",
-    property: 'x',
-    from: '50%', 
-    to: '200%',
-    easing: 'easeIn',
-    duration: 1
-  },
-
-  slideOutUp: {
-    name: "slideOutUp",
-    property: 'y',
-    from: '50%',
-    to: '-100%',
-    easing: 'easeIn',
-    duration: 1
-  },
-
-  slideOutDown: {
-    name: "slideOutDown",
-    property: 'y',
-    from: '50%',
-    to: '100%',
-    easing: 'easeIn',
     duration: 1
   },
 
@@ -153,42 +125,23 @@ export const AnimationPresets = {
     duration: 1
   },
 
-  // 翻转效果
-  flipInX: {
-    name: "flipInX",
-    property: 'rotationX',
-    from: -90,
-    to: 0,
-    easing: 'easeOut',
-    duration: 1
-  },
-
-  flipInY: {
-    name: "flipInY",
-    property: 'rotationY',
-    from: -90,
-    to: 0,
-    easing: 'easeOut',
-    duration: 1
-  },
-
-  // 缩放组合效果
-  zoomIn: {
-    name: "zoomIn",
-    property: 'scaleX',
-    from: 0.3,
-    to: 1,
-    easing: 'easeOut',
-    duration: 1
-  },
-
-  zoomOut: {
-    name: "zoomOut",
+  // 特殊效果
+  pulse: {
+    name: "pulse",
     property: 'scaleX',
     from: 1,
-    to: 0.3,
-    easing: 'easeIn',
-    duration: 1
+    to: 1.2,
+    easing: 'easeInOut',
+    duration: 0.5
+  },
+
+  wobble: {
+    name: "wobble",
+    property: 'rotation',
+    from: -5,
+    to: 5,
+    easing: 'easeInOut',
+    duration: 0.5
   },
 
   // 弹性效果
@@ -198,7 +151,7 @@ export const AnimationPresets = {
     from: 0,
     to: 1,
     easing: 'elastic',
-    duration: 1.5
+    duration: 1
   },
 
   elasticOut: {
@@ -207,192 +160,226 @@ export const AnimationPresets = {
     from: 1,
     to: 0,
     easing: 'elastic',
-    duration: 1.5
-  },
-
-  // 脉冲效果
-  pulse: {
-    name: "pulse",
-    property: 'scaleX',
-    from: 1,
-    to: 1.1,
-    easing: 'easeInOut',
-    duration: 0.5
-  },
-
-  // 摇摆效果
-  wobble: {
-    name: "wobble",
-    property: 'rotation',
-    from: 0,
-    to: 15,
-    easing: 'easeInOut',
-    duration: 0.3
-  },
-
-  // 闪烁效果
-  flash: {
-    name: "flash",
-    property: 'opacity',
-    from: 1,
-    to: 0,
-    easing: 'linear',
-    duration: 0.1
-  },
-
-  // 摇摆进入
-  swingIn: {
-    name: "swingIn",
-    property: 'rotation',
-    from: -15,
-    to: 0,
-    easing: 'easeOut',
-    duration: 1
-  },
-
-  // 摇摆退出
-  swingOut: {
-    name: "swingOut",
-    property: 'rotation',
-    from: 0,
-    to: 15,
-    easing: 'easeIn',
     duration: 1
   }
 };
 
-/**
- * 过渡效果预设
- * 提供常用的场景过渡效果预设
- */
 export const TransitionPresets = {
-  // 淡入淡出
+  // 淡入淡出过渡
   fade: {
-    name: "fade",
-    duration: 1,
+    name: 'fade',
     easing: 'easeInOut'
   },
 
   // 滑动过渡
   slideLeft: {
-    name: "directional-left",
-    duration: 1,
+    name: 'directional-left',
     easing: 'easeInOut'
   },
 
   slideRight: {
-    name: "directional-right", 
-    duration: 1,
+    name: 'directional-right',
     easing: 'easeInOut'
   },
 
   slideUp: {
-    name: "directional-up",
-    duration: 1,
+    name: 'directional-up',
     easing: 'easeInOut'
   },
 
   slideDown: {
-    name: "directional-down",
-    duration: 1,
+    name: 'directional-down',
     easing: 'easeInOut'
   },
 
   // 缩放过渡
   zoomIn: {
-    name: "zoom-in",
-    duration: 1,
+    name: 'zoom-in',
     easing: 'easeInOut'
   },
 
   zoomOut: {
-    name: "zoom-out",
-    duration: 1,
+    name: 'zoom-out',
     easing: 'easeInOut'
   },
 
   // 旋转过渡
-  rotateLeft: {
-    name: "rotate-left",
-    duration: 1,
-    easing: 'easeInOut'
-  },
-
-  rotateRight: {
-    name: "rotate-right",
-    duration: 1,
+  rotate: {
+    name: 'rotate',
     easing: 'easeInOut'
   },
 
   // 翻转过渡
-  flipX: {
-    name: "flip-x",
-    duration: 1,
+  flip: {
+    name: 'flip',
     easing: 'easeInOut'
   },
 
-  flipY: {
-    name: "flip-y",
-    duration: 1,
+  // 溶解过渡
+  dissolve: {
+    name: 'dissolve',
     easing: 'easeInOut'
   },
 
-  // 擦除过渡
-  wipeLeft: {
-    name: "wipe-left",
-    duration: 1,
-    easing: 'easeInOut'
-  },
-
-  wipeRight: {
-    name: "wipe-right",
-    duration: 1,
-    easing: 'easeInOut'
-  },
-
-  wipeUp: {
-    name: "wipe-up",
-    duration: 1,
-    easing: 'easeInOut'
-  },
-
-  wipeDown: {
-    name: "wipe-down",
-    duration: 1,
-    easing: 'easeInOut'
-  },
-
-  // 圆形过渡
-  circleOpen: {
-    name: "circle-open",
-    duration: 1,
-    easing: 'easeInOut'
-  },
-
-  circleClose: {
-    name: "circle-close",
-    duration: 1,
+  // 滑动门过渡
+  slideDoor: {
+    name: 'slide-door',
     easing: 'easeInOut'
   },
 
   // 百叶窗过渡
   blinds: {
-    name: "blinds",
-    duration: 1,
+    name: 'blinds',
     easing: 'easeInOut'
   },
 
   // 棋盘过渡
   checkerboard: {
-    name: "checkerboard",
-    duration: 1,
+    name: 'checkerboard',
+    easing: 'easeInOut'
+  },
+
+  // 圆形过渡
+  circle: {
+    name: 'circle',
+    easing: 'easeInOut'
+  },
+
+  // 星形过渡
+  star: {
+    name: 'star',
+    easing: 'easeInOut'
+  },
+
+  // 心形过渡
+  heart: {
+    name: 'heart',
+    easing: 'easeInOut'
+  },
+
+  // 钻石过渡
+  diamond: {
+    name: 'diamond',
+    easing: 'easeInOut'
+  },
+
+  // 三角形过渡
+  triangle: {
+    name: 'triangle',
+    easing: 'easeInOut'
+  },
+
+  // 六边形过渡
+  hexagon: {
+    name: 'hexagon',
+    easing: 'easeInOut'
+  },
+
+  // 八边形过渡
+  octagon: {
+    name: 'octagon',
+    easing: 'easeInOut'
+  },
+
+  // 十字过渡
+  cross: {
+    name: 'cross',
+    easing: 'easeInOut'
+  },
+
+  // 箭头过渡
+  arrow: {
+    name: 'arrow',
+    easing: 'easeInOut'
+  },
+
+  // 波浪过渡
+  wave: {
+    name: 'wave',
+    easing: 'easeInOut'
+  },
+
+  // 螺旋过渡
+  spiral: {
+    name: 'spiral',
+    easing: 'easeInOut'
+  },
+
+  // 爆炸过渡
+  explode: {
+    name: 'explode',
+    easing: 'easeInOut'
+  },
+
+  // 收缩过渡
+  implode: {
+    name: 'implode',
+    easing: 'easeInOut'
+  },
+
+  // 像素过渡
+  pixelate: {
+    name: 'pixelate',
+    easing: 'easeInOut'
+  },
+
+  // 马赛克过渡
+  mosaic: {
+    name: 'mosaic',
+    easing: 'easeInOut'
+  },
+
+  // 水波纹过渡
+  ripple: {
+    name: 'ripple',
+    easing: 'easeInOut'
+  },
+
+  // 漩涡过渡
+  whirl: {
+    name: 'whirl',
+    easing: 'easeInOut'
+  },
+
+  // 风车过渡
+  windmill: {
+    name: 'windmill',
+    easing: 'easeInOut'
+  },
+
+  // 扇形过渡
+  fan: {
+    name: 'fan',
+    easing: 'easeInOut'
+  },
+
+  // 窗帘过渡
+  curtain: {
+    name: 'curtain',
+    easing: 'easeInOut'
+  },
+
+  // 卷帘过渡
+  roller: {
+    name: 'roller',
+    easing: 'easeInOut'
+  },
+
+  // 百叶窗过渡
+  venetian: {
+    name: 'venetian',
     easing: 'easeInOut'
   },
 
   // 随机过渡
   random: {
-    name: "random",
-    duration: 1,
+    name: 'random',
+    easing: 'easeInOut'
+  },
+
+  // 自定义过渡
+  custom: {
+    name: 'custom',
     easing: 'easeInOut'
   }
 };
@@ -404,15 +391,25 @@ export const TransitionPresets = {
  * @returns {object} 动画配置
  */
 export function getAnimationPreset(presetName, overrides = {}) {
-  const preset = AnimationPresets[presetName];
-  if (!preset) {
-    throw new Error(`动画预设 "${presetName}" 不存在`);
+  // 首先尝试基础预设
+  if (AnimationPresets[presetName]) {
+    const preset = AnimationPresets[presetName];
+    
+    // 如果是数组（多属性动画），需要处理每个属性
+    if (Array.isArray(preset)) {
+      return preset.map(prop => ({ ...prop, ...overrides }));
+    }
+    
+    // 单属性动画
+    return { ...preset, ...overrides };
   }
   
-  return {
-    ...preset,
-    ...overrides
-  };
+  // 如果基础预设中没有，尝试 AnimationManager 预设
+  try {
+    return getAnimationManagerPreset(presetName, overrides);
+  } catch (error) {
+    throw new Error(`动画预设 "${presetName}" 不存在`);
+  }
 }
 
 /**
@@ -447,4 +444,38 @@ export function getAnimationPresetNames() {
  */
 export function getTransitionPresetNames() {
   return Object.keys(TransitionPresets);
+}
+
+// ========== 合并 AnimationManager 预设 ==========
+
+// 将 AnimationManager 预设合并到基础预设中
+Object.assign(AnimationPresets, AnimationManagerPresets);
+
+/**
+ * 获取所有动画预设名称（包含基础预设和 AnimationManager 预设）
+ * @returns {string[]} 预设名称列表
+ */
+export function getAllAnimationPresetNames() {
+  const baseNames = Object.keys(AnimationPresets);
+  const managerNames = getAnimationManagerPresetNames();
+  
+  // 合并并去重
+  const allNames = [...new Set([...baseNames, ...managerNames])];
+  return allNames.sort();
+}
+
+/**
+ * 检查是否为多属性动画
+ * @param {string} presetName 预设名称
+ * @returns {boolean} 是否为多属性动画
+ */
+export function isMultiPropertyAnimation(presetName) {
+  // 检查基础预设
+  const basePreset = AnimationPresets[presetName];
+  if (basePreset) {
+    return Array.isArray(basePreset);
+  }
+  
+  // 检查 AnimationManager 预设
+  return isManagerMultiProperty(presetName);
 }

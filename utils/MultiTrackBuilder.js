@@ -165,7 +165,7 @@ class Track {
       if (this.elements[elementIndex]) {
         if (typeof animationConfig === 'string') {
           const preset = getAnimationPreset(animationConfig, overrides);
-          animationConfigs = [preset];
+          animationConfigs = Array.isArray(preset) ? preset : [preset];
         } else if (Array.isArray(animationConfig)) {
           animationConfigs = animationConfig.map(anim => {
             if (typeof anim === 'string') {
@@ -186,7 +186,7 @@ class Track {
       
       if (typeof animationConfig === 'string') {
         const preset = getAnimationPreset(animationConfig, overrides);
-        animationConfigs = [preset];
+        animationConfigs = Array.isArray(preset) ? preset : [preset];
       } else if (Array.isArray(animationConfig)) {
         animationConfigs = animationConfig.map(anim => {
           if (typeof anim === 'string') {
@@ -450,7 +450,7 @@ class Scene {
       if (this.elements[elementIndex]) {
         if (typeof animationConfig === 'string') {
           const preset = getAnimationPreset(animationConfig, overrides);
-          animationConfigs = [preset];
+          animationConfigs = Array.isArray(preset) ? preset : [preset];
         } else if (Array.isArray(animationConfig)) {
           animationConfigs = animationConfig.map(anim => {
             if (typeof anim === 'string') {
@@ -471,7 +471,7 @@ class Scene {
       
       if (typeof animationConfig === 'string') {
         const preset = getAnimationPreset(animationConfig, overrides);
-        animationConfigs = [preset];
+        animationConfigs = Array.isArray(preset) ? preset : [preset];
       } else if (Array.isArray(animationConfig)) {
         animationConfigs = animationConfig.map(anim => {
           if (typeof anim === 'string') {

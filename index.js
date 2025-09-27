@@ -142,7 +142,17 @@ export {
   getAnimationPreset,
   getTransitionPreset,
   getAnimationPresetNames,
-  getTransitionPresetNames
+  getTransitionPresetNames,
+  getAllAnimationPresetNames,
+  isMultiPropertyAnimation
 } from "./utils/AnimationPresets.js";
+
+// 导出 AnimationManager 预设
+export { 
+  AnimationManagerPresets,
+  getAnimationManagerPreset,
+  getAnimationManagerPresetNames,
+  isMultiPropertyAnimation as isAnimationManagerMultiProperty
+} from "./utils/AnimationManagerPresets.js";
 
 export default VideoMaker;

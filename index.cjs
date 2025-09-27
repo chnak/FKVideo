@@ -201,7 +201,9 @@ async function getAnimationPresets() {
     getAnimationPreset,
     getTransitionPreset,
     getAnimationPresetNames,
-    getTransitionPresetNames
+    getTransitionPresetNames,
+    getAllAnimationPresetNames,
+    isMultiPropertyAnimation
   } = await import("./utils/AnimationPresets.js");
   return { 
     AnimationPresets, 
@@ -209,7 +211,25 @@ async function getAnimationPresets() {
     getAnimationPreset,
     getTransitionPreset,
     getAnimationPresetNames,
-    getTransitionPresetNames
+    getTransitionPresetNames,
+    getAllAnimationPresetNames,
+    isMultiPropertyAnimation
+  };
+}
+
+// 导出 AnimationManager 预设
+async function getAnimationManagerPresets() {
+  const { 
+    AnimationManagerPresets,
+    getAnimationManagerPreset,
+    getAnimationManagerPresetNames,
+    isMultiPropertyAnimation
+  } = await import("./utils/AnimationManagerPresets.js");
+  return { 
+    AnimationManagerPresets,
+    getAnimationManagerPreset,
+    getAnimationManagerPresetNames,
+    isAnimationManagerMultiProperty: isMultiPropertyAnimation
   };
 }
 
@@ -228,7 +248,8 @@ module.exports = {
   getSceneManager,
   getSceneTemplateManager,
   getMultiTrackBuilder,
-  getAnimationPresets
+  getAnimationPresets,
+  getAnimationManagerPresets
 };
 
 // 默认导出
