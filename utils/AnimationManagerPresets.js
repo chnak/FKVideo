@@ -12,7 +12,7 @@ export const AnimationManagerPresets = {
     from: 0,
     to: 1,
     duration: 0.6,
-    easing: 'easeOut'
+    easing: 'easeIn'
   },
 
   fadeOut: {
@@ -20,7 +20,7 @@ export const AnimationManagerPresets = {
     from: 1,
     to: 0,
     duration: 0.6,
-    easing: 'easeIn',
+    easing: 'easeOut',
     delay: -0.6  // 在元素结束前0.6秒开始
   },
 
