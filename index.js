@@ -127,4 +127,22 @@ export {
 export { SceneManager, Scene } from "./scenes/SceneManager.js";
 export { SceneTemplateManager } from "./scenes/SceneTemplates.js";
 
+// 导出多轨道构建器
+export { 
+  MultiTrackBuilder, 
+  Track, 
+  Scene as MultiTrackScene,
+  createMultiTrackBuilder 
+} from "./utils/MultiTrackBuilder.js";
+
+// 导出动画预设
+export { 
+  AnimationPresets, 
+  TransitionPresets,
+  getAnimationPreset,
+  getTransitionPreset,
+  getAnimationPresetNames,
+  getTransitionPresetNames
+} from "./utils/AnimationPresets.js";
+
 export default VideoMaker;

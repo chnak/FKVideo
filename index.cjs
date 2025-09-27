@@ -182,6 +182,37 @@ async function getSceneTemplateManager() {
   return { SceneTemplateManager };
 }
 
+// 导出多轨道构建器
+async function getMultiTrackBuilder() {
+  const { 
+    MultiTrackBuilder, 
+    Track, 
+    Scene,
+    createMultiTrackBuilder 
+  } = await import("./utils/MultiTrackBuilder.js");
+  return { MultiTrackBuilder, Track, MultiTrackScene: Scene, createMultiTrackBuilder };
+}
+
+// 导出动画预设
+async function getAnimationPresets() {
+  const { 
+    AnimationPresets, 
+    TransitionPresets,
+    getAnimationPreset,
+    getTransitionPreset,
+    getAnimationPresetNames,
+    getTransitionPresetNames
+  } = await import("./utils/AnimationPresets.js");
+  return { 
+    AnimationPresets, 
+    TransitionPresets,
+    getAnimationPreset,
+    getTransitionPreset,
+    getAnimationPresetNames,
+    getTransitionPresetNames
+  };
+}
+
 module.exports = {
   VideoMaker,
   // 导出异步获取函数
@@ -195,7 +226,9 @@ module.exports = {
   getAnimation,
   getAnimationBuilder,
   getSceneManager,
-  getSceneTemplateManager
+  getSceneTemplateManager,
+  getMultiTrackBuilder,
+  getAnimationPresets
 };
 
 // 默认导出
