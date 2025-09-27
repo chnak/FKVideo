@@ -14,7 +14,7 @@ async function compositionSimpleTest() {
       height: 720,
       fps: 30,
       elements: [
-        // 测试1: 基础组合 - 图片 + 文本
+        // 轨道1
         {
           type: "composition",
           duration: 15,
@@ -25,6 +25,7 @@ async function compositionSimpleTest() {
           height: '100%',
           zIndex: 1,
           elements: [
+            // 场景1
             {
               type:"composition",
               duration: 5,
@@ -59,6 +60,7 @@ async function compositionSimpleTest() {
                 }
               ]
             },
+            // 场景2
             {
               type:"composition",
               duration: 5,
@@ -111,6 +113,7 @@ async function compositionSimpleTest() {
                 }
               ]
             },
+            // 场景3
             {
               type:"composition",
               duration: 5,
@@ -149,6 +152,7 @@ async function compositionSimpleTest() {
             
           ]
         },
+        // 轨道2
         {
           type: "composition",
           duration: 15,
@@ -172,6 +176,7 @@ async function compositionSimpleTest() {
             }
           ]
         },
+        // 轨道3
         {
           type: "composition",
           startTime: 0,
@@ -198,12 +203,15 @@ async function compositionSimpleTest() {
         },
         
       ],
+      // 过渡效果
       transitions: [
+        // 过渡效果1
         {
           name: "directional-left",
           startTime: 4.5, // 在场景 1 结束前 0.5 秒开始
           duration: 1.0   // 过渡持续 1 秒
         },
+        // 过渡效果2
         {
           name: "directional-right",
           startTime: 9.5, // 在场景 1 结束前 0.5 秒开始

@@ -12,7 +12,7 @@ export class TitleElement extends BaseElement {
     this.fontPath = config.fontPath;
     this.fontFamily = config.fontFamily;
     this.fontSize = config.fontSize || 72; // 添加 fontSize 参数，默认 72px
-    this.textColor = config.textColor || '#ffffff';
+    this.textColor = config.textColor || config.color || '#ffffff';
     this.position = config.position || 'center';
     this.zoomDirection = config.zoomDirection; // 不设置默认值，只有传入时才启用
     this.zoomAmount = config.zoomAmount || 0.2;
