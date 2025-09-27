@@ -57,9 +57,9 @@ function syncDurationWithMinDuration(textSegments, totalDuration, minDuration = 
 
   return segments;
 }
-export const parseSubtitles=function parseSubtitles(text,duration) {
+export const parseSubtitles=function parseSubtitles(text,duration,maxLength) {
   const text_list_with_duration=calculateSpeechTimeMixed(text);
-  const text_list=splitText(text);
+  const text_list=splitText(text,maxLength);
   duration=duration||text_list_with_duration
   return syncDurationWithMinDuration(text_list,duration);
 }

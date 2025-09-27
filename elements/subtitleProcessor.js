@@ -52,6 +52,16 @@ function createCenteredTextWithBackground(textContent, options = {}) {
 
   return group;
 }
+//计算文本容量
+function calculateTextCapacity(screenWidth, fontSize) {
+  // 估算单个字符的平均宽度（通常是字体大小的 0.6-0.8 倍）
+  const avgCharWidth = fontSize * 0.6;
+  
+  // 计算可容纳的字符数
+  const maxChars = Math.floor(screenWidth / avgCharWidth);
+  
+  return maxChars;
+}
 /**
  * 创建字幕元素
  */
@@ -86,7 +96,9 @@ export async function createTextElement(config) {
     audio = null, // 音频文件路径
     volume = 1.0, // 音量
     fadeIn = 0, // 淡入时间
-    fadeOut = 0 // 淡出时间
+    fadeOut = 0, // 淡出时间
+    canvasWidth,
+    canvasHeight
   } = config;
 
   // 使用 BaseElement 的字体处理逻辑
@@ -95,10 +107,11 @@ export async function createTextElement(config) {
   const finalFontSize = fontResult.fontSize;
 
   // 计算尺寸和位置
-  const min = Math.min(width, height);
+  const min = Math.min(canvasWidth, canvasHeight);
   const finalPadding = padding !== null ? padding : 0.05 * min;
   const finalFontSizeValue = finalFontSize;
-  const text_list=parseSubtitles(text,duration);
+  const maxLength = calculateTextCapacity(canvasWidth, finalFontSize);
+  const text_list=parseSubtitles(text,duration,maxLength);
   let totalDuration = 0;
   const textSegments = text_list.map((item, index) => { 
     

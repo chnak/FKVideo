@@ -73,7 +73,9 @@ export class SubtitleElement extends BaseElement {
       audioSegments: this.audioSegments,
       volume: this.volume,
       fadeIn: this.fadeIn,
-      fadeOut: this.fadeOut
+      fadeOut: this.fadeOut,
+      canvasWidth: this.canvasWidth,
+      canvasHeight: this.canvasHeight
     });
     
     //console.log(`✅ 文本元素初始化完成:`, this.textElement ? '成功' : '失败');
