@@ -96,7 +96,7 @@ class Track {
       duration: config.duration || this.duration,
       startTime: config.startTime || 0,
       zIndex: config.zIndex || 3,
-      backgroundColor: config.backgroundColor || 'rgba(0,0,0,0.7)',
+      backgroundColor: config.backgroundColor,
       backgroundPadding: config.backgroundPadding || 10,
       backgroundRadius: config.backgroundRadius || 5,
       ...config
@@ -186,7 +186,7 @@ class Track {
       
       if (typeof animationConfig === 'string') {
         const preset = getAnimationPreset(animationConfig, overrides);
-        animationConfigs = Array.isArray(preset) ? preset : [preset];
+        animationConfigs = [preset];
       } else if (Array.isArray(animationConfig)) {
         animationConfigs = animationConfig.map(anim => {
           if (typeof anim === 'string') {
@@ -401,7 +401,7 @@ class Scene {
       duration: config.duration || this.duration,
       startTime: config.startTime || 0,
       zIndex: config.zIndex || 3,
-      backgroundColor: config.backgroundColor || 'rgba(0,0,0,0.7)',
+      backgroundColor: config.backgroundColor,
       backgroundPadding: config.backgroundPadding || 10,
       backgroundRadius: config.backgroundRadius || 5,
       ...config
@@ -471,7 +471,7 @@ class Scene {
       
       if (typeof animationConfig === 'string') {
         const preset = getAnimationPreset(animationConfig, overrides);
-        animationConfigs = Array.isArray(preset) ? preset : [preset];
+        animationConfigs = [preset];
       } else if (Array.isArray(animationConfig)) {
         animationConfigs = animationConfig.map(anim => {
           if (typeof anim === 'string') {
@@ -1096,7 +1096,7 @@ export class SceneBuilder {
       duration: config.duration || this.scene.duration,
       startTime: config.startTime || 0,
       zIndex: config.zIndex || 3,
-      backgroundColor: config.backgroundColor || 'rgba(0,0,0,0.7)',
+      backgroundColor: config.backgroundColor,
       backgroundPadding: config.backgroundPadding || 10,
       backgroundRadius: config.backgroundRadius || 5,
       ...config
