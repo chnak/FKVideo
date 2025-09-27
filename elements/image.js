@@ -21,7 +21,6 @@ export class ImageElement extends BaseElement {
 
   async initialize() {
     await super.initialize();
-    console.log(this.source);
     if (this.source) {
       this.imageElement = await createImageElement({
         source: this.source,

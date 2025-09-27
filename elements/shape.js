@@ -34,7 +34,9 @@ export class ShapeElement extends BaseElement {
   }
 
   async readNextFrame(time, canvas) {
-    await this.initialize();
+    if (!this.shapeElement) {
+      await this.initialize();
+    }
     
     if (!this.shapeElement) {
       return null;

@@ -80,7 +80,9 @@ export class SubtitleElement extends BaseElement {
   }
 
   async readNextFrame(time, canvas) {
-    await this.initialize();
+    if (!this.textElement) {
+      await this.initialize();
+    }
     
     if (!this.textElement) {
       return null;

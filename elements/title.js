@@ -136,7 +136,9 @@ export class TitleElement extends BaseElement {
   }
 
   async readNextFrame(time, canvas) {
-    await this.initialize();
+    if (!this.titleElement) {
+      await this.initialize();
+    }
     
     if (!this.titleElement) {
       return null;

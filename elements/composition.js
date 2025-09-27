@@ -42,7 +42,9 @@ export class CompositionElement extends BaseElement {
   }
 
   async readNextFrame(time, canvas) {
-    await this.initialize();
+    if (!this.isInitialized) {
+      await this.initialize();
+    }
     
     // 检查时间是否在 Composition 的范围内
     if (time < this.startTime || time > this.endTime) {
