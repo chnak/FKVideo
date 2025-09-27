@@ -9,7 +9,7 @@ function createCenteredTextWithBackground(textContent, options = {}) {
     fontSize = 24,
     fontFamily = 'Arial',
     fill = '#000',
-    backgroundColor = '#ffff00',
+    backgroundColor,
     padding = 10,
     left = 0,
     top = 0,
@@ -27,18 +27,22 @@ function createCenteredTextWithBackground(textContent, options = {}) {
   });
 
   // 创建背景矩形
-  const background = new fabric.Rect({
-    width: text.width + padding * 2,
-    height: text.height + padding * 2,
-    fill: backgroundColor,
-    originX: 'center',
-    originY: 'center',
-    rx: 5,  // x轴圆角半径
-    ry: 5   // y轴圆角半径
-  });
+  const objects = [text]
+  if(backgroundColor){  
+    const background = new fabric.Rect({
+      width: text.width + padding * 2,
+      height: text.height + padding * 2,
+      fill: backgroundColor,
+      originX: 'center',
+      originY: 'center',
+      rx: 5,  // x轴圆角半径
+      ry: 5   // y轴圆角半径
+    }); 
+    objects.splice(0,0,background)
+  }
 
   // 创建组，使用指定的原点
-  const group = new fabric.Group([background, text], {
+  const group = new fabric.Group(objects, {
     left,
     top,
     originX,  // 使用传入的 originX
@@ -65,7 +69,7 @@ export async function createTextElement(config) {
     fontFamily = null,
     fontSize = 48,
     textColor = "#ffffff",
-    backgroundColor = "rgba(0,0,0,0.3)",
+    backgroundColor,
     delay = 0,
     speed = 1,
     padding = 10,

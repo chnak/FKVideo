@@ -24,7 +24,7 @@ export class SubtitleElement extends BaseElement {
     this.textAlign = config.textAlign || 'left';
     this.textBaseline = config.textBaseline || 'top';
     this.lineHeight = config.lineHeight || 1.2;
-    this.backgroundColor = config.backgroundColor || 'rgba(0, 0, 0, 0.3)';
+    this.backgroundColor = config.backgroundColor;
     this.position = config.position || 'bottom';
     this.padding = config.padding || 10;
     this.audio = config.audio;
