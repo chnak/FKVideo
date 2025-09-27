@@ -110,7 +110,7 @@ export async function createTextElement(config) {
   const min = Math.min(canvasWidth, canvasHeight);
   const finalPadding = padding !== null ? padding : 0.05 * min;
   const finalFontSizeValue = finalFontSize;
-  const maxLength = calculateTextCapacity(canvasWidth, finalFontSize);
+  const maxLength = calculateTextCapacity(canvasWidth*0.8, finalFontSize);
   const text_list=parseSubtitles(text,duration,maxLength);
   let totalDuration = 0;
   const textSegments = text_list.map((item, index) => { 
