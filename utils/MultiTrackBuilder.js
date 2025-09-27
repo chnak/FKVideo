@@ -1157,4 +1157,8 @@ export function createSceneBuilder(sceneConfig = {}) {
   return new SceneBuilder(sceneConfig);
 }
 
+// 导出类
+export { Track };
+export { Scene };
+
 export default MultiTrackBuilder;
