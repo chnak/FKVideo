@@ -1,4 +1,5 @@
 import { VideoMaker } from "../index.js";
+import { getAnimationPreset, getTransitionPreset, AnimationPresets, TransitionPresets } from "./AnimationPresets.js";
 
 /**
  * 轨道类 - 支持链式调用的轨道对象
@@ -148,11 +149,63 @@ class Track {
 
   /**
    * 添加动画到指定元素
+   * @param {number} elementIndex 元素索引
+   * @param {string|object|array} animations 动画预设名称、动画配置或动画配置数组
+   * @param {object} overrides 覆盖参数
    */
-  addAnimation(elementIndex, animations) {
-    if (this.elements[elementIndex]) {
-      this.elements[elementIndex].animations = animations;
+  addAnimation(elementIndexOrAnimation, animations = null, overrides = {}) {
+    let animationConfigs = [];
+    
+    // 判断第一个参数是元素索引还是动画配置
+    if (typeof elementIndexOrAnimation === 'number') {
+      // 传统用法：addAnimation(elementIndex, animations, overrides)
+      const elementIndex = elementIndexOrAnimation;
+      const animationConfig = animations;
+      
+      if (this.elements[elementIndex]) {
+        if (typeof animationConfig === 'string') {
+          const preset = getAnimationPreset(animationConfig, overrides);
+          animationConfigs = [preset];
+        } else if (Array.isArray(animationConfig)) {
+          animationConfigs = animationConfig.map(anim => {
+            if (typeof anim === 'string') {
+              return getAnimationPreset(anim, overrides);
+            }
+            return anim;
+          });
+        } else if (typeof animationConfig === 'object') {
+          animationConfigs = [animationConfig];
+        }
+        
+        this.elements[elementIndex].animations = animationConfigs;
+      }
+    } else {
+      // 链式用法：addAnimation(animations, overrides) - 应用到整个场景
+      const animationConfig = elementIndexOrAnimation;
+      overrides = animations || {};
+      
+      if (typeof animationConfig === 'string') {
+        const preset = getAnimationPreset(animationConfig, overrides);
+        animationConfigs = [preset];
+      } else if (Array.isArray(animationConfig)) {
+        animationConfigs = animationConfig.map(anim => {
+          if (typeof anim === 'string') {
+            return getAnimationPreset(anim, overrides);
+          }
+          return anim;
+        });
+      } else if (typeof animationConfig === 'object') {
+        animationConfigs = [animationConfig];
+      }
+      
+      // 如果场景已有动画，追加到现有动画数组
+      if (this.animations) {
+        this.animations.push(...animationConfigs);
+      } else {
+        this.animations = animationConfigs;
+      }
     }
+    
     return this;
   }
 
@@ -161,6 +214,19 @@ class Track {
    */
   addElement(element) {
     this.elements.push(element);
+    return this;
+  }
+
+  /**
+   * 为最后一个元素添加动画（链式调用）
+   * @param {string|object|array} animations 动画预设名称、动画配置或动画配置数组
+   * @param {object} overrides 覆盖参数
+   */
+  addAnimationToLast(animations, overrides = {}) {
+    if (this.elements.length > 0) {
+      const elementIndex = this.elements.length - 1;
+      this.addAnimation(elementIndex, animations, overrides);
+    }
     return this;
   }
 
@@ -255,6 +321,7 @@ class Scene {
     this.height = sceneConfig.height || '100%';
     this.zIndex = sceneConfig.zIndex || 1;
     this.elements = [];
+    this.animations = []; // 场景级别的动画
     this.builder = builder;
     this.sceneIndex = builder.scenes.length;
     
@@ -367,11 +434,63 @@ class Scene {
 
   /**
    * 添加动画到指定元素
+   * @param {number} elementIndex 元素索引
+   * @param {string|object|array} animations 动画预设名称、动画配置或动画配置数组
+   * @param {object} overrides 覆盖参数
    */
-  addAnimation(elementIndex, animations) {
-    if (this.elements[elementIndex]) {
-      this.elements[elementIndex].animations = animations;
+  addAnimation(elementIndexOrAnimation, animations = null, overrides = {}) {
+    let animationConfigs = [];
+    
+    // 判断第一个参数是元素索引还是动画配置
+    if (typeof elementIndexOrAnimation === 'number') {
+      // 传统用法：addAnimation(elementIndex, animations, overrides)
+      const elementIndex = elementIndexOrAnimation;
+      const animationConfig = animations;
+      
+      if (this.elements[elementIndex]) {
+        if (typeof animationConfig === 'string') {
+          const preset = getAnimationPreset(animationConfig, overrides);
+          animationConfigs = [preset];
+        } else if (Array.isArray(animationConfig)) {
+          animationConfigs = animationConfig.map(anim => {
+            if (typeof anim === 'string') {
+              return getAnimationPreset(anim, overrides);
+            }
+            return anim;
+          });
+        } else if (typeof animationConfig === 'object') {
+          animationConfigs = [animationConfig];
+        }
+        
+        this.elements[elementIndex].animations = animationConfigs;
+      }
+    } else {
+      // 链式用法：addAnimation(animations, overrides) - 应用到整个场景
+      const animationConfig = elementIndexOrAnimation;
+      overrides = animations || {};
+      
+      if (typeof animationConfig === 'string') {
+        const preset = getAnimationPreset(animationConfig, overrides);
+        animationConfigs = [preset];
+      } else if (Array.isArray(animationConfig)) {
+        animationConfigs = animationConfig.map(anim => {
+          if (typeof anim === 'string') {
+            return getAnimationPreset(anim, overrides);
+          }
+          return anim;
+        });
+      } else if (typeof animationConfig === 'object') {
+        animationConfigs = [animationConfig];
+      }
+      
+      // 如果场景已有动画，追加到现有动画数组
+      if (this.animations) {
+        this.animations.push(...animationConfigs);
+      } else {
+        this.animations = animationConfigs;
+      }
     }
+    
     return this;
   }
 
@@ -380,6 +499,19 @@ class Scene {
    */
   addElement(element) {
     this.elements.push(element);
+    return this;
+  }
+
+  /**
+   * 为最后一个元素添加动画（链式调用）
+   * @param {string|object|array} animations 动画预设名称、动画配置或动画配置数组
+   * @param {object} overrides 覆盖参数
+   */
+  addAnimationToLast(animations, overrides = {}) {
+    if (this.elements.length > 0) {
+      const elementIndex = this.elements.length - 1;
+      this.addAnimation(elementIndex, animations, overrides);
+    }
     return this;
   }
 
@@ -491,9 +623,23 @@ export class MultiTrackBuilder {
 
   /**
    * 添加过渡效果
+   * @param {string|object} transitionConfig 过渡预设名称或过渡配置
+   * @param {object} overrides 覆盖参数
    */
-  addTransition(transitionConfig) {
-    this.transitions.push(transitionConfig);
+  addTransition(transitionConfig, overrides = {}) {
+    let transition;
+    
+    if (typeof transitionConfig === 'string') {
+      // 预设过渡名称
+      transition = getTransitionPreset(transitionConfig, overrides);
+    } else if (typeof transitionConfig === 'object') {
+      // 过渡配置对象
+      transition = transitionConfig;
+    } else {
+      throw new Error('过渡配置必须是字符串或对象');
+    }
+    
+    this.transitions.push(transition);
     return this;
   }
 
@@ -741,7 +887,8 @@ export class MultiTrackBuilder {
       width: scene.width,
       height: scene.height,
       zIndex: scene.zIndex,
-      elements: scene.elements
+      elements: scene.elements,
+      animations: scene.animations || []
     }));
     
     // 添加其他轨道
@@ -768,7 +915,8 @@ export class MultiTrackBuilder {
           width: scene.width,
           height: scene.height,
           zIndex: scene.zIndex,
-          elements: scene.elements
+          elements: scene.elements,
+          animations: scene.animations || []
         })),
         // 轨道直接包含的元素
         ...track.elements,
@@ -783,6 +931,34 @@ export class MultiTrackBuilder {
       elements: serializedTracks,
       transitions: this.transitions
     };
+  }
+
+  /**
+   * 获取所有动画预设名称
+   */
+  getAnimationPresetNames() {
+    return Object.keys(AnimationPresets);
+  }
+
+  /**
+   * 获取所有过渡预设名称
+   */
+  getTransitionPresetNames() {
+    return Object.keys(TransitionPresets);
+  }
+
+  /**
+   * 获取动画预设
+   */
+  getAnimationPreset(presetName, overrides = {}) {
+    return getAnimationPreset(presetName, overrides);
+  }
+
+  /**
+   * 获取过渡预设
+   */
+  getTransitionPreset(presetName, overrides = {}) {
+    return getTransitionPreset(presetName, overrides);
   }
 
   /**
