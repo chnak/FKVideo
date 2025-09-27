@@ -66,7 +66,7 @@ export const parseSubtitles=function parseSubtitles(text,duration,maxLength) {
 /**
 * 分割文本
 */
-function splitText(text,maxLength = MAX_LENGTH) {
+function splitText(text, maxLength = MAX_LENGTH) {
   // 1. 去除多余的引号和换行符
   text = text.replace(/["“”'‘’\n\r]/g, '');
 
@@ -77,24 +77,81 @@ function splitText(text,maxLength = MAX_LENGTH) {
   // 3. 按 SIGN 分割，并过滤空字符串
   let segments = text.split(SIGN).filter(seg => seg.trim());
 
-  // 4. 处理长句子（超过 MAX_LENGTH 的按字数分割）
+  // 4. 处理长句子（超过 MAX_LENGTH 的按字数分割），保护英文单词
   segments = segments.flatMap(seg => {
     if (seg.length <= maxLength) return seg;
+    
     const chunks = [];
     let start = 0;
+    
     while (start < seg.length) {
       let end = Math.min(start + maxLength, seg.length);
-      // 避免在标点中间切断
-      if (end < seg.length && /[，。！？、]/.test(seg[end])) {
+      
+      // 避免在标点中间切断（增加英文标点）
+      if (end < seg.length && /[，。！？、,.;!?]/.test(seg[end])) {
         end++;
       }
+      // 新增：避免分割英文单词
+      else if (end < seg.length && isSplittingEnglishWord(seg, end)) {
+        end = findSafeSplitPoint(seg, start, end, maxLength);
+      }
+      
       chunks.push(seg.slice(start, end));
       start = end;
     }
+    
     return chunks;
   });
 
   return segments;
+}
+
+// 新增辅助函数：检查是否正在分割英文单词
+function isSplittingEnglishWord(text, position) {
+  if (position === 0 || position >= text.length) return false;
+  
+  const prevChar = text[position - 1];
+  const currChar = text[position];
+  const nextChar = position < text.length - 1 ? text[position + 1] : '';
+  
+  // 如果前后字符都是英文字母，说明正在分割单词
+  return /[a-zA-Z]/.test(prevChar) && /[a-zA-Z]/.test(currChar);
+}
+
+// 新增辅助函数：查找安全的分割点
+function findSafeSplitPoint(text, start, proposedEnd, maxLength) {
+  let end = proposedEnd;
+  
+  // 方案1：向前查找空格或标点
+  for (let i = end - 1; i > start; i--) {
+    if (text[i] === ' ' || /[，。！？、,.;!?]/.test(text[i])) {
+      return i + 1; // 在空格或标点后分割
+    }
+  }
+  
+  // 方案2：向后查找空格或标点
+  for (let i = end; i < Math.min(text.length, end + 10); i++) {
+    if (text[i] === ' ' || /[，。！？、,.;!?]/.test(text[i])) {
+      return i + 1; // 在空格或标点后分割
+    }
+  }
+  
+  // 方案3：如果找不到合适位置，在单词后添加连字符
+  if (end < text.length) {
+    // 检查是否在英文单词中间
+    let wordEnd = end;
+    while (wordEnd < text.length && /[a-zA-Z]/.test(text[wordEnd])) {
+      wordEnd++;
+    }
+    
+    // 如果单词长度可控，尽量完整包含
+    if (wordEnd - start <= maxLength + 5) {
+      return wordEnd;
+    }
+  }
+  
+  // 最后手段：按原位置分割（实在无法避免时）
+  return proposedEnd;
 }
 
 /**

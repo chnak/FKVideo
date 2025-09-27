@@ -53,14 +53,37 @@ function createCenteredTextWithBackground(textContent, options = {}) {
   return group;
 }
 //计算文本容量
-function calculateTextCapacity(screenWidth, fontSize) {
-  // 估算单个字符的平均宽度（通常是字体大小的 0.6-0.8 倍）
-  const avgCharWidth = fontSize * 0.6;
+function calculateMixedTextCapacity(screenWidth, fontSize, text, fontFamily = 'Microsoft YaHei') {
+  // 统计中英文比例
+  const chineseChars = text.match(/[\u4e00-\u9fa5]/g) || [];
+  const englishChars = text.match(/[a-zA-Z]/g) || [];
+  const otherChars = text.match(/[^\u4e00-\u9fa5a-zA-Z\s]/g) || [];
   
-  // 计算可容纳的字符数
+  const totalChars = chineseChars.length + englishChars.length + otherChars.length;
+  const chineseRatio = chineseChars.length / totalChars;
+  const englishRatio = englishChars.length / totalChars;
+  
+  // 不同字符的宽度系数
+  const chineseWidth = fontSize * 1.0;    // 中文字符宽度
+  const englishWidth = fontSize * 0.6;    // 英文字符宽度
+  const otherWidth = fontSize * 0.7;      // 其他字符宽度
+  
+  // 计算平均字符宽度
+  const avgCharWidth = (chineseWidth * chineseRatio) + 
+                      (englishWidth * englishRatio) + 
+                      (otherWidth * (1 - chineseRatio - englishRatio));
+  
   const maxChars = Math.floor(screenWidth / avgCharWidth);
   
-  return maxChars;
+  return {
+    maxChars,
+    avgCharWidth,
+    chineseCount: chineseChars.length,
+    englishCount: englishChars.length,
+    otherCount: otherChars.length,
+    chineseRatio,
+    englishRatio
+  };
 }
 /**
  * 创建字幕元素
@@ -110,8 +133,8 @@ export async function createTextElement(config) {
   const min = Math.min(canvasWidth, canvasHeight);
   const finalPadding = padding !== null ? padding : 0.05 * min;
   const finalFontSizeValue = finalFontSize;
-  const maxLength = calculateTextCapacity(canvasWidth*0.8, finalFontSize);
-  const text_list=parseSubtitles(text,duration,maxLength);
+  const maxLength = calculateMixedTextCapacity(canvasWidth*0.85, finalFontSize, text, finalFontFamily);
+  const text_list=parseSubtitles(text,duration,maxLength.maxChars);
   let totalDuration = 0;
   const textSegments = text_list.map((item, index) => { 
     
