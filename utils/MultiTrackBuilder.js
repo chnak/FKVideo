@@ -333,8 +333,39 @@ class Scene {
    * 添加背景
    */
   addBackground(config = {}) {
+    // 预设背景颜色
+    const presetColors = [
+      //"#ff6b6b", // 红色
+      "#4ecdc4", // 青色
+      "#45b7d1", // 蓝色
+      "#f39c12", // 橙色
+      "#e74c3c", // 深红色
+      "#9b59b6", // 紫色
+      "#1abc9c", // 青绿色
+      "#2ecc71", // 绿色
+      "#f1c40f", // 黄色
+      "#34495e", // 深灰色
+      "#e67e22", // 深橙色
+      "#8e44ad", // 深紫色
+      "#16a085", // 深青绿色
+      "#27ae60", // 深绿色
+      "#f39c12", // 金色
+      "#2c3e50", // 深蓝灰色
+      "#e74c3c", // 珊瑚红
+      "#3498db", // 天蓝色
+      "#95a5a6", // 浅灰色
+      "#ecf0f1"  // 浅白色
+    ];
+    
+    // 如果没有指定颜色，随机选择一个预设颜色
+    let backgroundColor = config.color;
+    if (!backgroundColor) {
+      const randomIndex = Math.floor(Math.random() * presetColors.length);
+      backgroundColor = presetColors[randomIndex];
+    }
+    
     const background = this.builder.createBackground({
-      color: config.color || "#000000",
+      color: backgroundColor,
       duration: this.duration,
       startTime: 0,
       zIndex: 0,
