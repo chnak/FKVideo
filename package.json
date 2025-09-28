@@ -18,6 +18,15 @@
     "example:creatomate": "node examples/creatomate-style-example.js",
     "example:require": "node examples/require-example.js",
     "test:require": "node test-require.cjs",
+    "test:scene-animation": "node examples/simple-scene-animation-test.js",
+    "test:fadein": "node examples/simple-fadein-test.js",
+    "test:easing": "node examples/simple-easing-test.js",
+    "check:easing": "node examples/check-easing-parameters.js",
+    "test:unified-presets": "node examples/test-unified-presets.js",
+    "test:custom-animation": "node examples/simple-custom-animation.js",
+    "demo:custom-animation": "node examples/custom-animation-demo.js",
+    "test:background-colors": "node examples/simple-background-test.js",
+    "demo:background-colors": "node examples/background-colors-demo.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
