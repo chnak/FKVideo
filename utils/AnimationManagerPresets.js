@@ -11,7 +11,7 @@ export const AnimationManagerPresets = {
     property: 'opacity',
     from: 0,
     to: 1,
-    duration: 0.6,
+    duration: 0.8,
     easing: 'easeIn'
   },
 
@@ -19,9 +19,9 @@ export const AnimationManagerPresets = {
     property: 'opacity',
     from: 1,
     to: 0,
-    duration: 0.6,
+    duration: 0.8,
     easing: 'easeOut',
-    delay: -0.6  // 在元素结束前0.6秒开始
+    delay: -0.8  // 在元素结束前0.6秒开始
   },
 
   // 缩放动画
@@ -29,7 +29,7 @@ export const AnimationManagerPresets = {
     property: 'scaleX',
     from: 0,
     to: 1,
-    duration: 0.6,
+    duration: 0.8,
     easing: 'easeOut'
   },
 
@@ -37,9 +37,9 @@ export const AnimationManagerPresets = {
     property: 'scaleX',
     from: 1,
     to: 0,
-    duration: 0.6,
+    duration: 0.8,
     easing: 'easeIn',
-    delay: -0.6  // 在元素结束前0.6秒开始
+    delay: -0.8  // 在元素结束前0.6秒开始
   },
 
   // 旋转动画
@@ -65,7 +65,7 @@ export const AnimationManagerPresets = {
     property: 'x',
     from: -300,
     to: 0,
-    duration: 0.6,
+    duration: 0.8,
     easing: 'easeOut',
     isOffset: true
   },
@@ -74,7 +74,7 @@ export const AnimationManagerPresets = {
     property: 'x',
     from: 300,
     to: 0,
-    duration: 0.6,
+    duration: 0.8,
     easing: 'easeOut',
     isOffset: true
   },
@@ -83,7 +83,7 @@ export const AnimationManagerPresets = {
     property: 'y',
     from: -200,
     to: 0,
-    duration: 0.6,
+    duration: 0.8,
     easing: 'easeOut',
     isOffset: true
   },
@@ -92,7 +92,7 @@ export const AnimationManagerPresets = {
     property: 'y',
     from: 200,
     to: 0,
-    duration: 0.6,
+    duration: 0.8,
     easing: 'easeOut',
     isOffset: true
   },
@@ -102,40 +102,40 @@ export const AnimationManagerPresets = {
     property: 'x',
     from: 0,
     to: -300,
-    duration: 0.6,
+    duration: 0.8,
     easing: 'easeIn',
     isOffset: true,
-    delay: -0.6  // 在元素结束前0.6秒开始
+    delay: -0.8  // 在元素结束前0.6秒开始
   },
 
   slideOutRight: {
     property: 'x',
     from: 0,
     to: 300,
-    duration: 0.6,
+    duration: 0.8,
     easing: 'easeIn',
     isOffset: true,
-    delay: -0.6  // 在元素结束前0.6秒开始
+    delay: -0.8  // 在元素结束前0.6秒开始
   },
 
   slideOutTop: {
     property: 'y',
     from: 0,
     to: -200,
-    duration: 0.6,
+    duration: 0.8,
     easing: 'easeIn',
     isOffset: true,
-    delay: -0.6  // 在元素结束前0.6秒开始
+    delay: -0.8  // 在元素结束前0.6秒开始
   },
 
   slideOutBottom: {
     property: 'y',
     from: 0,
     to: 200,
-    duration: 0.6,
+    duration: 0.8,
     easing: 'easeIn',
     isOffset: true,
-    delay: -0.6  // 在元素结束前0.6秒开始
+    delay: -0.8  // 在元素结束前0.6秒开始
   },
 
   // ========== 现代特效动画 ==========
@@ -160,6 +160,12 @@ export const AnimationManagerPresets = {
     { property: 'scaleX', from: 0, to: 1, duration: 0.6, easing: 'easeInBounce' },
     { property: 'scaleY', from: 0, to: 1, duration: 0.6, easing: 'easeInBounce' },
     { property: 'opacity', from: 0, to: 1, duration: 0.6, easing: 'easeOut' }
+  ],
+  // 现代弹跳效果
+  bounceOut: [
+    { property: 'scaleX', from: 1, to: 0, duration: 0.6, easing: 'easeOutBounce', delay: -0.6 },
+    { property: 'scaleY', from: 1, to: 0, duration: 0.6, easing: 'easeOutBounce', delay: -0.6 },
+    { property: 'opacity', from: 1, to: 0, duration: 0.6, easing: 'easeIn', delay: -0.6 }
   ],
 
   // 弹性效果
@@ -195,23 +201,23 @@ export const AnimationManagerPresets = {
 
   // 震动效果
   shake: [
-    { property: 'x', from: -10, to: 10, duration: 0.1, easing: 'linear' },
-    { property: 'x', from: 10, to: -10, duration: 0.1, easing: 'linear', delay: 0.1 },
-    { property: 'x', from: -10, to: 10, duration: 0.1, easing: 'linear', delay: 0.2 },
-    { property: 'x', from: 10, to: 0, duration: 0.1, easing: 'linear', delay: 0.3 }
+    { property: 'x', from: -10, to: 10, duration: 0.1, easing: 'linear' , isOffset: true},
+    { property: 'x', from: 10, to: -10, duration: 0.1, easing: 'linear', delay: 0.1 , isOffset: true},
+    { property: 'x', from: -10, to: 10, duration: 0.1, easing: 'linear', delay: 0.2 , isOffset: true},
+    { property: 'x', from: 10, to: 0, duration: 0.1, easing: 'linear', delay: 0.3 , isOffset: true}
   ],
 
   // 波浪效果
   wave: [
-    { property: 'y', from: 0, to: -10, duration: 0.5, easing: 'easeInOut' },
-    { property: 'y', from: -10, to: 0, duration: 0.5, easing: 'easeInOut', delay: 0.5 }
+    { property: 'y', from: 0, to: -10, duration: 0.5, easing: 'easeInOut' , isOffset: true},
+    { property: 'y', from: -10, to: 0, duration: 0.5, easing: 'easeInOut', delay: 0.5 , isOffset: true}
   ],
 
   // 故障效果
   glitch: [
-    { property: 'x', from: 0, to: -5, duration: 0.1, easing: 'linear' },
-    { property: 'x', from: -5, to: 5, duration: 0.1, easing: 'linear', delay: 0.1 },
-    { property: 'x', from: 5, to: 0, duration: 0.1, easing: 'linear', delay: 0.2 },
+    { property: 'x', from: 0, to: -5, duration: 0.1, easing: 'linear' , isOffset: true},
+    { property: 'x', from: -5, to: 5, duration: 0.1, easing: 'linear', delay: 0.1 , isOffset: true},
+    { property: 'x', from: 5, to: 0, duration: 0.1, easing: 'linear', delay: 0.2 , isOffset: true},
     { property: 'opacity', from: 1, to: 0.8, duration: 0.1, easing: 'linear', delay: 0.1 },
     { property: 'opacity', from: 0.8, to: 1, duration: 0.1, easing: 'linear', delay: 0.2 }
   ],
@@ -274,14 +280,14 @@ export const AnimationManagerPresets = {
 
   // 超级缩放进入
   superZoomIn: [
-    { property: 'scaleX', from: 0, to: 1, duration: 0.6, easing: 'easeOut' },
-    { property: 'scaleY', from: 0, to: 1, duration: 0.6, easing: 'easeOut' },
-    { property: 'opacity', from: 0, to: 1, duration: 0.4, easing: 'easeOut' }
+    { property: 'scaleX', from: 0, to: 1, duration: 0.8, easing: 'easeIn' },
+    { property: 'scaleY', from: 0, to: 1, duration: 0.8, easing: 'easeIn' },
+    { property: 'opacity', from: 0, to: 1, duration: 0.8, easing: 'easeIn' }
   ],
   superZoomOut: [
-    { property: 'scaleX', from: 1, to: 0, duration: 0.6, easing: 'easeIn', delay: -0.6 },
-    { property: 'scaleY', from: 1, to: 0, duration: 0.6, easing: 'easeIn', delay: -0.6 },
-    { property: 'opacity', from: 1, to: 0, duration: 0.4, easing: 'easeIn', delay: -0.4 }
+    { property: 'scaleX', from: 1, to: 0, duration: 0.8, easing: 'easeOut', delay: -0.6 },
+    { property: 'scaleY', from: 1, to: 0, duration: 0.8, easing: 'easeOut', delay: -0.6 },
+    { property: 'opacity', from: 1, to: 0, duration: 0.8, easing: 'easeOut', delay: -0.4 }
   ],
 
   // 超级滑入左侧
