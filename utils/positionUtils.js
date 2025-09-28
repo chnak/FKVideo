@@ -79,8 +79,8 @@ export function getPositionProps({
   originX = 'center', 
   originY = 'center' 
 }) {
-  // 如果提供了自定义坐标且不是默认值，优先使用
-  if (x !== undefined && y !== undefined && (x !== 0 || y !== 0)) {
+  // 如果提供了自定义坐标，优先使用（包括 x:0, y:0 的情况）
+  if (x !== undefined && y !== undefined) {
     const left = parsePositionValue(x, width, 'px');
     const top = parsePositionValue(y, height, 'px');
     
