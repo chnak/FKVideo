@@ -112,6 +112,9 @@ export class BaseElement {
       } else if (animConfig.preset) {
         // 如果是预设动画配置
         animationResult = this.animationManager.applyPreset(animConfig.preset, animConfig);
+      } else if (animConfig.name) {
+        // 如果是 { name: "slideInFromRight", duration: 1, delay: 1 } 格式，当作预设动画处理
+        animationResult = this.animationManager.applyPreset(animConfig.name, animConfig);
       } else if (animConfig.keyframes) {
         // 如果是关键帧动画
         animationResult = this.animationManager.createKeyframeAnimation(animConfig);
