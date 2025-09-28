@@ -32,7 +32,7 @@ async function projectShowcaseDemo() {
       fontWeight: 'bold'
     })
     .addText({
-      text: "基于 Creatomate 配置结构的视频制作库",
+      text: "基于 JSON 格式化配置结构的视频制作库",
       textColor: "#ffffff",
       fontSize: 36,
       x: '50%',
@@ -126,7 +126,10 @@ async function projectShowcaseDemo() {
       x: '25%',
       y: '35%',
       textAlign: 'center',
-      animations:["fadeIn","fadeOut"]
+      animations:[
+        {type:"fadeIn",duration:1.5,delay:2},
+        {type:"fadeOut",duration:1.5,delay:-3}
+      ]
     })
     .addText({
       text: "缩放效果",
@@ -135,7 +138,10 @@ async function projectShowcaseDemo() {
       x: '75%',
       y: '35%',
       textAlign: 'center',
-      animations:["superZoomIn","superZoomOut"]
+      animations:[
+        {type:"superZoomIn",duration:1.5,delay:3},
+        {type:"superZoomOut",duration:1.5,delay:-3}
+      ]
     })
     .addText({
       text: "旋转效果",
@@ -144,7 +150,10 @@ async function projectShowcaseDemo() {
       x: '25%',
       y: '65%',
       textAlign: 'center',
-      animations:["rotateIn","rotateOut"]
+      animations:[
+        {type:"rotateIn",duration:1.5,delay:3},
+        {type:"rotateOut",duration:1.5,delay:-3}
+      ]
     })
     .addText({
       text: "弹跳效果",
@@ -153,7 +162,10 @@ async function projectShowcaseDemo() {
       x: '75%',
       y: '65%',
       textAlign: 'center',
-      animations:["superBounceIn","superBounceOut"]
+      animations:[
+        {type:"bounceIn",duration:1.5,delay:3},
+        {type:"bounceOut",duration:1.5,delay:-3}
+      ]
     })
     .addAnimation('zoomIn', { duration: 1})
     .addAnimation('zoomOut', { duration: 1,delay:-1})
@@ -432,5 +444,6 @@ async function projectShowcaseDemo() {
 if (import.meta.url === `file://${process.argv[1]}`) {
   projectShowcaseDemo().catch(console.error);
 }
+projectShowcaseDemo().catch(console.error);
 
 export { projectShowcaseDemo };
