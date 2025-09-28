@@ -24,8 +24,8 @@ export class CompositionElement extends BaseElement {
     // 解析子元素，使用 Composition 的宽高作为子元素的画布尺寸
     this.configParser = new ConfigParser({
       elements: this.elements,
-      canvasWidth: this.width,  // 使用 Composition 的宽度
-      canvasHeight: this.height, // 使用 Composition 的高度
+      width: this.width,  // 使用 Composition 的宽度
+      height: this.height, // 使用 Composition 的高度
       fps: this.fps,
       defaults: this.config?.defaults || {}
     });
