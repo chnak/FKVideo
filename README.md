@@ -1,4 +1,4 @@
-# FKVideo - 基于 Creatomate 配置结构的视频制作库
+# FKVideo - 基于 JSON 配置结构的视频制作库
 
 [![Version](https://img.shields.io/badge/version-1.0.2-blue.svg)](https://github.com/your-username/FKVideo)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
