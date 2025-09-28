@@ -48,11 +48,12 @@ export class AudioElement extends BaseElement {
    */
   async processAudio() {
     try {
-      //console.log(`[AudioElement] 开始处理音频文件: ${this.source}`);
+      // console.log(`[AudioElement] 开始处理音频文件: ${this.source}`);
       
       // 检查文件是否有音频流
+      // console.log(`[AudioElement] 调用 readFileStreams...`);
       const streams = await readFileStreams(this.source);
-      //console.log(`[AudioElement] 文件流信息:`, streams);
+      // console.log(`[AudioElement] 文件流信息:`, streams);
       
       if (!streams.some(s => s.codec_type === "audio")) {
         throw new Error(`文件 ${this.source} 不包含音频流`);
@@ -164,12 +165,12 @@ export class AudioElement extends BaseElement {
 
     args.push("-y", audioPath);
 
-    //console.log(`[AudioElement] FFmpeg命令:`, args);
-    //console.log(`[AudioElement] 开始执行FFmpeg...`);
+    // console.log(`[AudioElement] FFmpeg命令:`, args);
+    // console.log(`[AudioElement] 开始执行FFmpeg...`);
     
     await ffmpeg(args);
     
-    //console.log(`[AudioElement] FFmpeg执行完成`);
+    // console.log(`[AudioElement] FFmpeg执行完成`);
     return audioPath;
   }
 

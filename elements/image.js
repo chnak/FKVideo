@@ -12,10 +12,12 @@ export class ImageElement extends BaseElement {
     this.imageElement = null;
     this.canvasWidth = config.canvasWidth;
     this.canvasHeight = config.canvasHeight;
+    
     // 图片特有属性
     // 解析尺寸值，支持百分比和像素单位
     this.imageWidth = config.width ? parseSizeValue(config.width, this.canvasWidth) : this.canvasWidth;
     this.imageHeight = config.height ? parseSizeValue(config.height, this.canvasHeight) : this.canvasHeight;
+    
     this.fit = config.fit || 'cover'; // 'cover', 'contain', 'fill', 'scale-down'
   }
 

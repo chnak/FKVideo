@@ -238,6 +238,38 @@ export class CompositionElement extends BaseElement {
 
 
 
+  /**
+   * 获取所有子元素中的音频元素
+   */
+  async getAudioElements() {
+    const audioElements = [];
+    
+    // 确保已经初始化
+    if (!this.isInitialized) {
+      await this.initialize();
+    }
+    
+    // console.log(`[CompositionElement] 子元素数量: ${this.subElements.length}`);
+    // console.log(`[CompositionElement] 子元素类型: ${this.subElements.map(el => el.type)}`);
+    
+    // 获取直接的音频元素
+    const directAudioElements = this.subElements.filter(element => element.type === 'audio');
+    // console.log(`[CompositionElement] 直接音频元素数量: ${directAudioElements.length}`);
+    audioElements.push(...directAudioElements);
+    
+    // 获取其他子元素中的音频元素
+    for (const element of this.subElements) {
+      if (element.getAudioElements && typeof element.getAudioElements === 'function') {
+        const elementAudioElements = await element.getAudioElements();
+        // console.log(`[CompositionElement] 子元素 ${element.type} 返回 ${elementAudioElements.length} 个音频元素`);
+        audioElements.push(...elementAudioElements);
+      }
+    }
+    
+    // console.log(`[CompositionElement] 总共返回 ${audioElements.length} 个音频元素`);
+    return audioElements;
+  }
+
   async close() {
     // 关闭所有子元素
     for (const element of this.subElements) {

@@ -464,6 +464,26 @@ class Scene {
   }
 
   /**
+   * 添加音频
+   */
+  addAudio(config = {}) {
+    const audio = this.builder.createAudio({
+      source: config.source,
+      volume: config.volume || 1,
+      duration: config.duration || this.duration,
+      startTime: config.startTime || 0,
+      zIndex: config.zIndex || 0,
+      loop: config.loop || false,
+      fadeIn: config.fadeIn || 0,
+      fadeOut: config.fadeOut || 0,
+      ...config
+    });
+    
+    this.elements.push(audio);
+    return this;
+  }
+
+  /**
    * 添加动画到指定元素
    * @param {number} elementIndex 元素索引
    * @param {string|object|array} animations 动画预设名称、动画配置或动画配置数组
@@ -902,28 +922,7 @@ export class MultiTrackBuilder {
       }
     });
     
-    // 将所有场景添加到主轨道
-    const mainTrack = this.createTrack({
-      zIndex: 1,
-      duration: maxDuration
-    });
-    
-    // 将场景对象序列化为普通对象
-    mainTrack.elements = this.scenes.map(scene => ({
-      type: scene.type,
-      duration: scene.duration,
-      startTime: scene.startTime,
-      x: scene.x,
-      y: scene.y,
-      width: scene.width,
-      height: scene.height,
-      zIndex: scene.zIndex,
-      elements: scene.elements,
-      animations: scene.animations || []
-    }));
-    
-    // 添加其他轨道
-    this.tracks.push(mainTrack);
+    // 不需要创建主轨道，场景直接作为元素处理
     
     // 将所有轨道对象序列化为普通对象
     const serializedTracks = this.tracks.map(track => ({
@@ -954,12 +953,26 @@ export class MultiTrackBuilder {
       ]
     }));
     
+    // 将场景直接作为元素返回
+    const sceneElements = this.scenes.map(scene => ({
+      type: scene.type,
+      duration: scene.duration,
+      startTime: scene.startTime,
+      x: scene.x,
+      y: scene.y,
+      width: scene.width,
+      height: scene.height,
+      zIndex: scene.zIndex,
+      elements: scene.elements,
+      animations: scene.animations || []
+    }));
+
     return {
       outPath: this.config.outPath,
       width: this.config.width,
       height: this.config.height,
       fps: this.config.fps,
-      elements: serializedTracks,
+      elements: [...sceneElements, ...serializedTracks],
       transitions: this.transitions
     };
   }
