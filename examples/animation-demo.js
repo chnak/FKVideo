@@ -19,8 +19,10 @@ async function animationDemo() {
           type: "image",
           source: "./assets/img1.jpg",
           duration: 8,
-          x: 0,
-          y: 0,
+          x: '50%',
+          y: '50%',
+          width: '100%',
+          height: '100%',
           scaleX: 1,
           scaleY: 1
         },
@@ -128,7 +130,7 @@ async function animationDemo() {
           x: 1000,
           y: 350,
           startTime: 3,
-          animations: [quickPreset('bounceIn', { duration: 1.5 })]
+          animations: ["slideInLeft"]
         },
         
         {
@@ -141,7 +143,7 @@ async function animationDemo() {
           x: 1000,
           y: 450,
           startTime: 3.5,
-          animations: [quickPreset('elasticIn', { duration: 1.5 })]
+          animations: ["slideInBottom"]
         },
         
         // 底部文本 - 复杂动画组合
