@@ -467,7 +467,13 @@ export async function createTitleElement(config) {
           // segment.startTime 和 segment.endTime 是相对于分割动画的延迟时间（秒）
           // 使用绝对时间来计算分割动画进度
           const absoluteTime = time || (progress * duration);
-          const segmentProgress = Math.max(0, Math.min(1, (absoluteTime - segment.startTime) / (segment.endTime - segment.startTime)));
+          const segmentStartTime = segment.startTime;
+          const segmentEndTime = segment.endTime;
+          const segmentProgress = Math.max(0, Math.min(1, (absoluteTime - segmentStartTime) / (segmentEndTime - segmentStartTime)));
+          
+          // if (i === 0) { // Only log for first segment to avoid spam
+          //   console.log(`[TitleProcessor] 分割文本段 ${i}: 绝对时间=${absoluteTime}, 段开始时间=${segmentStartTime}, 段结束时间=${segmentEndTime}, 段进度=${segmentProgress}`);
+          // }
           
           
           if (segmentProgress > 0) {
@@ -509,7 +515,9 @@ export async function createTitleElement(config) {
               // 收集所有动画值
               for (const anim of animations) {
                 const absoluteTime = time || (progress * duration);
-                const animValue = anim.getValueAtTime(absoluteTime);
+                // 对于分割文本，需要调整动画时间，使其相对于段开始时间
+                const adjustedTime = absoluteTime - segmentStartTime;
+                const animValue = anim.getValueAtTime(adjustedTime);
                 
                 switch (anim.property) {
                   case 'scaleX':
@@ -568,6 +576,7 @@ export async function createTitleElement(config) {
               if (opacityAnimations.length > 0) {
                 // 对于透明度，使用乘法组合
                 opacity = opacityAnimations.reduce((acc, val) => acc * val, 1);
+                // console.log(`[TitleProcessor] 分割文本透明度动画值: ${opacity}`);
               }
               if (translateXAnimations.length > 0) {
                 translateX += translateXAnimations.reduce((acc, val) => acc + val, 0);
@@ -580,6 +589,9 @@ export async function createTitleElement(config) {
             // 如果没有透明度动画，使用分割进度作为透明度
             if (!hasOpacityAnimation) {
               opacity = segmentProgress;
+            } else {
+              // 如果有透明度动画，将动画值与分割进度相乘
+              opacity = opacity * segmentProgress;
             }
             
             // 创建Fabric.js Text对象渲染分割文本片段
