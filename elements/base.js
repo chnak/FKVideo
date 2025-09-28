@@ -192,8 +192,16 @@ export class BaseElement {
   getTransformAtTime(time) {
     const progress = this.getProgressAtTime(time);
     
+    // 解析 x 和 y 位置，支持百分比和数值
     let x = this.x;
     let y = this.y;
+    
+    if (typeof this.x === 'string') {
+      x = parsePositionValue(this.x, this.canvasWidth, 'px');
+    }
+    if (typeof this.y === 'string') {
+      y = parsePositionValue(this.y, this.canvasHeight, 'px');
+    }
     let scaleX = this.scaleX;
     let scaleY = this.scaleY;
     let rotation = this.rotation;
@@ -388,14 +396,12 @@ export class BaseElement {
   applyTransformToFrameData(frameData, transform) {
     if (!frameData) return null;
 
-    // 统一使用 BaseElement 的位置解析，所有元素都自动支持 position 属性
-    const positionProps = this.getPositionProps();
-    
-    // 应用变换信息
+    // 使用动画计算后的位置，而不是静态位置
+    // transform 已经包含了动画后的 x, y 位置
     return {
       ...frameData,
-      x: positionProps.left,
-      y: positionProps.top,
+      x: transform.x,
+      y: transform.y,
       scaleX: transform.scaleX,
       scaleY: transform.scaleY,
       rotation: transform.rotation,
@@ -403,8 +409,8 @@ export class BaseElement {
       rotationX: transform.rotationX,
       rotationY: transform.rotationY,
       translateZ: transform.translateZ,
-      originX: positionProps.originX,
-      originY: positionProps.originY,
+      originX: this.originX || 'center',
+      originY: this.originY || 'center',
     };
   }
 
@@ -417,13 +423,11 @@ export class BaseElement {
   applyTransformToFabricObject(fabricObject, transform) {
     if (!fabricObject || !fabricObject.set) return fabricObject;
 
-    // 获取位置属性
-    const positionProps = this.getPositionProps();
-    
-    // 应用变换信息
+    // 使用动画计算后的位置，而不是静态位置
+    // transform 已经包含了动画后的 x, y 位置
     fabricObject.set({
-      left: positionProps.left,
-      top: positionProps.top,
+      left: transform.x,
+      top: transform.y,
       scaleX: transform.scaleX,
       scaleY: transform.scaleY,
       angle: transform.rotation,
@@ -431,8 +435,8 @@ export class BaseElement {
       rotationX: transform.rotationX,
       rotationY: transform.rotationY,
       translateZ: transform.translateZ,
-      originX: positionProps.originX,
-      originY: positionProps.originY
+      originX: this.originX || 'center',
+      originY: this.originY || 'center'
     });
 
     return fabricObject;
@@ -496,7 +500,7 @@ export class BaseElement {
    */
   createCompleteFrameData(rawFrameData, transform) {
     if (!rawFrameData) return null;
-
+    
     // 如果是 contain-blur 效果
     if (rawFrameData.isContainBlur && rawFrameData.background && rawFrameData.foreground) {
       return {
@@ -577,10 +581,10 @@ export class BaseElement {
         objectLeft = originalLeft;
         objectTop = originalTop;
       } else {
-        // 普通文本：对象位置就是元素位置，不需要加上 originalLeft/originalTop
+        // 普通文本：使用动画计算后的位置，而不是静态位置
         // 因为 originalLeft/originalTop 是相对于文本起始位置的偏移，而普通文本只有一个对象
-        objectLeft = positionProps.left;
-        objectTop = positionProps.top;
+        objectLeft = transform.x;
+        objectTop = transform.y;
       }
       
       // 应用变换到 Fabric 对象
