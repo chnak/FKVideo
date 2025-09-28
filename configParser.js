@@ -13,8 +13,9 @@ import { AudioElement } from "./elements/audio.js";
 export class ConfigParser {
   constructor(config) {
     this.config = config;
-    this.canvasWidth = config.width || 1920;
-    this.canvasHeight = config.height || 1080;
+    this.canvasWidth = config.width||1280;
+    this.canvasHeight = config.height||720;
+
     this.tmpDir = config.tmpDir;
     this.elementTypes = {
       video: VideoElement,
