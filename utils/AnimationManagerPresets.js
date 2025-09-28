@@ -278,6 +278,11 @@ export const AnimationManagerPresets = {
     { property: 'scaleY', from: 0, to: 1, duration: 0.6, easing: 'easeOut' },
     { property: 'opacity', from: 0, to: 1, duration: 0.4, easing: 'easeOut' }
   ],
+  superZoomOut: [
+    { property: 'scaleX', from: 1, to: 0, duration: 0.6, easing: 'easeIn', delay: -0.6 },
+    { property: 'scaleY', from: 1, to: 0, duration: 0.6, easing: 'easeIn', delay: -0.6 },
+    { property: 'opacity', from: 1, to: 0, duration: 0.4, easing: 'easeIn', delay: -0.4 }
+  ],
 
   // 超级滑入左侧
   superSlideInLeft: [

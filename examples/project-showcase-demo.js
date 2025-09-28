@@ -125,7 +125,8 @@ async function projectShowcaseDemo() {
       fontSize: 48,
       x: '25%',
       y: '35%',
-      textAlign: 'center'
+      textAlign: 'center',
+      animations:["fadeIn","fadeOut"]
     })
     .addText({
       text: "缩放效果",
@@ -133,7 +134,8 @@ async function projectShowcaseDemo() {
       fontSize: 48,
       x: '75%',
       y: '35%',
-      textAlign: 'center'
+      textAlign: 'center',
+      animations:["superZoomIn","superZoomOut"]
     })
     .addText({
       text: "旋转效果",
@@ -141,7 +143,8 @@ async function projectShowcaseDemo() {
       fontSize: 48,
       x: '25%',
       y: '65%',
-      textAlign: 'center'
+      textAlign: 'center',
+      animations:["rotateIn","rotateOut"]
     })
     .addText({
       text: "弹跳效果",
@@ -149,7 +152,8 @@ async function projectShowcaseDemo() {
       fontSize: 48,
       x: '75%',
       y: '65%',
-      textAlign: 'center'
+      textAlign: 'center',
+      animations:["superBounceIn","superBounceOut"]
     })
     .addAnimation('zoomIn', { duration: 1})
     .addAnimation('zoomOut', { duration: 1,delay:-1})
