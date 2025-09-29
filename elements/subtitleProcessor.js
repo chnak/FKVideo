@@ -161,7 +161,7 @@ export async function createTextElement(config) {
       volume: volume,
       fadeIn: fadeIn,
       fadeOut: fadeOut,
-      startTime: 0,
+      startTime: config.startTime || 0, // 使用字幕元素的 startTime
       duration: duration
     });
     await globalAudioElement.initialize();
@@ -211,7 +211,7 @@ export async function createTextElement(config) {
             volume: textSegment.volume,
             fadeIn: textSegment.fadeIn,
             fadeOut: textSegment.fadeOut,
-            startTime: textSegment.startTime,
+            startTime: (config.startTime || 0) + textSegment.startTime, // 字幕元素 startTime + 段 startTime
             duration: textSegment.duration
           });
           await segmentAudioElement.initialize();
