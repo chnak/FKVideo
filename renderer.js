@@ -140,65 +140,79 @@ export class VideoRenderer {
     if (audioStreams.length === 1) {
       // 只有一个音频流，直接复制
       // console.log(`[Renderer] 只有一个音频流，直接复制`);
+      const stream = audioStreams[0];
       const args = [
-        '-i', audioStreams[0].path,
+        '-i', stream.path,
         '-c:a', 'flac',
         '-y', mixedAudioPath
       ];
+      
+      // 如果有延迟，添加延迟
+      if (stream.start > 0) {
+        args.splice(2, 0, '-itsoffset', stream.start.toString());
+      }
+      
       // console.log(`[Renderer] 单音频复制命令:`, args);
       await ffmpeg(args);
       // console.log(`[Renderer] 单音频复制完成`);
     } else {
-      // 多个音频流，使用简单的混合方法
-      // console.log(`[Renderer] 使用简单混合方法处理 ${audioStreams.length} 个音频流`);
+      // 多个音频流，使用 filter_complex 处理延迟
+      // console.log(`[Renderer] 使用 filter_complex 处理 ${audioStreams.length} 个音频流`);
       
-      // 先混合前两个音频
-      let currentMixedPath = join(this.tmpDir, 'temp-mixed-0.flac');
-      const firstTwoArgs = [
-        '-nostdin',
-        '-i', audioStreams[0].path,
-        '-i', audioStreams[1].path,
-        '-filter_complex', '[0:a][1:a]amix=inputs=2:duration=longest',
-        '-c:a', 'flac',
-        '-y', currentMixedPath
-      ];
+      // 构建输入参数
+      const inputArgs = [];
+      const filterParts = [];
       
-      // console.log(`[Renderer] 混合前两个音频:`, firstTwoArgs);
-      await ffmpeg(firstTwoArgs);
-      
-      // 如果有更多音频，继续混合
-      for (let i = 2; i < audioStreams.length; i++) {
-        const nextMixedPath = join(this.tmpDir, `temp-mixed-${i}.flac`);
-        const nextArgs = [
-          '-nostdin',
-          '-i', currentMixedPath,
-          '-i', audioStreams[i].path,
-          '-filter_complex', '[0:a][1:a]amix=inputs=2:duration=longest',
-          '-c:a', 'flac',
-          '-y', nextMixedPath
-        ];
+      for (let i = 0; i < audioStreams.length; i++) {
+        const stream = audioStreams[i];
+        inputArgs.push('-i', stream.path);
         
-        // console.log(`[Renderer] 混合第 ${i + 1} 个音频:`, nextArgs);
-        await ffmpeg(nextArgs);
+        // 为每个音频流创建延迟和音量调整
+        let filter = `[${i}:a]`;
+        let hasFilter = false;
         
-        // 删除之前的临时文件
-        const fs = await import('fs');
-        if (fs.existsSync(currentMixedPath)) {
-          fs.unlinkSync(currentMixedPath);
+        // 添加延迟
+        if (stream.start > 0) {
+          filter += `adelay=${Math.floor(stream.start * 1000)}|${Math.floor(stream.start * 1000)}`;
+          hasFilter = true;
         }
         
-        currentMixedPath = nextMixedPath;
+        // 添加音量调整
+        if (stream.mixVolume !== undefined && stream.mixVolume !== 1.0) {
+          if (hasFilter) {
+            filter += `,volume=${stream.mixVolume}`;
+          } else {
+            filter += `volume=${stream.mixVolume}`;
+            hasFilter = true;
+          }
+        }
+        
+        // 如果没有滤镜，直接复制音频
+        if (!hasFilter) {
+          filter = `[${i}:a]acopy[a${i}]`;
+        } else {
+          filter += `[a${i}]`;
+        }
+        
+        filterParts.push(filter);
       }
       
-      // 复制最终结果到目标路径
-      const fs = await import('fs');
-      fs.copyFileSync(currentMixedPath, mixedAudioPath);
+      // 混合所有音频流
+      const mixInputs = audioStreams.map((_, i) => `[a${i}]`).join('');
+      const mixFilter = `${mixInputs}amix=inputs=${audioStreams.length}:duration=longest:dropout_transition=0[aout]`;
+      filterParts.push(mixFilter);
       
-      // 清理临时文件
-      if (fs.existsSync(currentMixedPath)) {
-        fs.unlinkSync(currentMixedPath);
-      }
+      const args = [
+        '-nostdin',
+        ...inputArgs,
+        '-filter_complex', filterParts.join(';'),
+        '-map', '[aout]',
+        '-c:a', 'flac',
+        '-y', mixedAudioPath
+      ];
       
+      // console.log(`[Renderer] 多音频混合命令:`, args);
+      await ffmpeg(args);
       // console.log(`[Renderer] 多音频混合完成`);
     }
     
