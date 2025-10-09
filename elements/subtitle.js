@@ -64,6 +64,7 @@ export class SubtitleElement extends BaseElement {
       lineHeight: this.lineHeight,
       maxWidth: this.maxWidth,
       duration: this.duration,
+      startTime: this.startTime, // 传递startTime
       width: this.width,
       height: this.height,
       backgroundColor: this.backgroundColor,

@@ -143,7 +143,12 @@ export async function createTextElement(config) {
       index,
       startTime: 0,
       duration: item.duration,
-      endTime: 0
+      endTime: 0,
+      // 传递音频配置给每个字幕段
+      audio: audio,
+      volume: volume,
+      fadeIn: fadeIn,
+      fadeOut: fadeOut
     };
     data.startTime = totalDuration;
     totalDuration += data.duration;
