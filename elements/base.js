@@ -657,6 +657,11 @@ export class BaseElement {
       switch (valueUnit) {
         case 'px':
           return numValue;
+        case 'rpx':
+          // rpx单位：基于屏幕宽度的响应式像素单位
+          // 通常以750rpx为基准宽度，转换为实际像素
+          const baseWidth = 750; // 基准宽度（通常是设计稿宽度）
+          return (numValue / baseWidth) * width;
         case '%':
           // 百分比基于最小尺寸
           return (numValue / 100) * Math.min(width, height);
