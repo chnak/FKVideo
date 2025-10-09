@@ -75,7 +75,7 @@ export class CompositionElement extends BaseElement {
           if (!element.isInitialized) {
             await element.initialize();
           }
-          
+
           // 调用子元素的 readNextFrame 方法，使用相对时间
           // 这样子元素的时间系统相对于 Composition 本身
           const frameData = await element.readNextFrame(relativeTime, tempCanvas);

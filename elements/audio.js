@@ -11,9 +11,9 @@ export class AudioElement extends BaseElement {
     super(config);
     
     // 音频特有属性
-    this.source = config.source;
+    this.source = config.source||config.src;
     this.volume = config.volume || 1.0; // 音量 (0.0 - 1.0)
-    this.mixVolume = config.mixVolume || 1.0; // 混音音量
+    this.mixVolume = config.mixVolume || config.volume || 1.0; // 混音音量，默认使用volume值
     this.loop = config.loop || false; // 是否循环播放
     this.fadeIn = config.fadeIn || 0; // 淡入时间（秒）
     this.fadeOut = config.fadeOut || 0; // 淡出时间（秒）
