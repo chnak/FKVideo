@@ -727,8 +727,9 @@ const file_name=`output/demo.mp4`
 
         const subtitles=video.children.find(a=>a.id==='subtitle')?.children||[]
         const speakTrack = builder.createTrack({ zIndex: 2 });
+        const duration=subtitles.reduce((acc,item)=>acc+item.duration,0)
+        const scene = speakTrack.createScene({ duration: duration+3 })
         for(const item of subtitles){
-            const scene = speakTrack.createScene({ duration: item.duration,startTime:item.start||0 })
             const text=item.children.map(a=>a.text).join('')
             const ele=item.children[0];
             console.log(item.start,'==',item.duration)
