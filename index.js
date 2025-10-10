@@ -184,7 +184,9 @@ export {
   ElementSchema,
   
   // 动画和过渡
+  KeyframeSchema,
   AnimationSchema,
+  AnimationsArraySchema,
   TransitionSchema,
   
   // 场景和轨道
@@ -200,6 +202,8 @@ export {
   validateMultiTrackBuilderConfig,
   validateElement,
   validateAnimation,
+  validateAnimations,
+  validateKeyframe,
   validateTransition
 } from "./schemas/FKVideoSchema.js";
 

@@ -261,7 +261,9 @@ async function getSchemaValidation() {
     ElementSchema,
     
     // 动画和过渡
+    KeyframeSchema,
     AnimationSchema,
+    AnimationsArraySchema,
     TransitionSchema,
     
     // 场景和轨道
@@ -277,6 +279,8 @@ async function getSchemaValidation() {
     validateMultiTrackBuilderConfig,
     validateElement,
     validateAnimation,
+    validateAnimations,
+    validateKeyframe,
     validateTransition
   } = await import("./schemas/FKVideoSchema.js");
   
@@ -306,7 +310,9 @@ async function getSchemaValidation() {
     ElementSchema,
     
     // 动画和过渡
+    KeyframeSchema,
     AnimationSchema,
+    AnimationsArraySchema,
     TransitionSchema,
     
     // 场景和轨道
@@ -322,6 +328,8 @@ async function getSchemaValidation() {
     validateMultiTrackBuilderConfig,
     validateElement,
     validateAnimation,
+    validateAnimations,
+    validateKeyframe,
     validateTransition
   };
 }

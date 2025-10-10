@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { easingMap } from '../utils/easings.js';
 
 // ========== 基础类型定义 ==========
 
@@ -18,17 +19,8 @@ const ColorValueSchema = z.union([
   z.string().min(1, '颜色值不能为空')
 ]);
 
-// 缓动函数类型
-const EasingTypeSchema = z.enum([
-  'linear', 'easeIn', 'easeOut', 'easeInOut', 'easeInQuad', 'easeOutQuad',
-  'easeInOutQuad', 'easeInCubic', 'easeOutCubic', 'easeInOutCubic',
-  'easeInQuart', 'easeOutQuart', 'easeInOutQuart', 'easeInQuint',
-  'easeOutQuint', 'easeInOutQuint', 'easeInSine', 'easeOutSine',
-  'easeInOutSine', 'easeInExpo', 'easeOutExpo', 'easeInOutExpo',
-  'easeInCirc', 'easeOutCirc', 'easeInOutCirc', 'easeInBack',
-  'easeOutBack', 'easeInOutBack', 'easeInElastic', 'easeOutElastic',
-  'easeInOutElastic', 'easeInBounce', 'easeOutBounce', 'easeInOutBounce'
-]);
+// 缓动函数类型 - 直接从 utils/easings.js 导入
+const EasingTypeSchema = z.enum(Object.keys(easingMap));
 
 // 文本对齐类型
 const TextAlignSchema = z.enum(['left', 'center', 'right', 'justify']);
@@ -90,7 +82,7 @@ const BaseElementSchema = z.object({
   translateZ: z.number().default(0),
   
   // 动画属性
-  animations: z.array(z.any()).optional(),
+  animations: z.array(z.any()).default([]),
   
   // 临时目录
   tmpDir: z.string().optional()
@@ -330,25 +322,50 @@ const CompositionElementSchema = BaseElementSchema.extend({
 
 // ========== 动画配置 ==========
 
-const AnimationSchema = z.object({
-  property: z.string(),
-  from: z.union([z.number(), z.string()]).optional(),
-  to: z.union([z.number(), z.string()]).optional(),
-  duration: z.number().min(0).default(1),
-  startTime: z.number().min(0).default(0),
-  easing: EasingTypeSchema.default('easeInOut'),
-  delay: z.number().min(0).default(0),
-  repeat: z.number().min(0).default(1),
-  direction: z.enum(['normal', 'reverse', 'alternate', 'alternate-reverse']).default('normal'),
-  fillMode: z.enum(['none', 'forwards', 'backwards', 'both']).default('both'),
-  
-  // 关键帧动画
-  keyframes: z.array(z.object({
-    time: z.number().min(0).max(1),
-    value: z.union([z.number(), z.string()]),
-    easing: EasingTypeSchema.optional()
-  })).optional()
+// 关键帧配置
+const KeyframeSchema = z.object({
+  time: z.number().min(0).max(1),
+  value: z.union([z.number(), z.string()]),
+  easing: EasingTypeSchema.optional()
 });
+
+// 动画配置 - 支持多种格式
+const AnimationSchema = z.union([
+  // 1. 字符串格式 - 预设动画名称
+  z.string(),
+  
+  // 2. 对象格式 - 各种动画配置
+  z.object({
+    // 基础属性
+    property: z.string().optional(),
+    from: z.union([z.number(), z.string()]).optional(),
+    to: z.union([z.number(), z.string()]).optional(),
+    duration: z.number().min(0).default(1),
+    startTime: z.number().min(0).default(0),
+    easing: EasingTypeSchema.default('easeInOut'),
+    delay: z.number().default(0), // 允许负数（用于 Out 动画）
+    repeat: z.number().min(0).default(1),
+    direction: z.enum(['normal', 'reverse', 'alternate', 'alternate-reverse']).default('normal'),
+    fillMode: z.enum(['none', 'forwards', 'backwards', 'both']).default('both'),
+    
+    // 预设动画相关
+    type: z.string().optional(), // 预设动画类型
+    preset: z.string().optional(), // 预设动画名称
+    name: z.string().optional(), // 预设动画名称（兼容性）
+    
+    // 关键帧动画
+    keyframes: z.array(KeyframeSchema).optional(),
+    
+    // 动画 ID（用于管理）
+    id: z.string().optional(),
+    
+    // 是否为偏移量动画
+    isOffset: z.boolean().default(false)
+  })
+]);
+
+// 动画数组配置
+const AnimationsArraySchema = z.array(AnimationSchema).default([]);
 
 // ========== 过渡效果配置 ==========
 
@@ -471,7 +488,9 @@ export {
   ElementSchema,
   
   // 动画和过渡
+  KeyframeSchema,
   AnimationSchema,
+  AnimationsArraySchema,
   TransitionSchema,
   
   // 场景和轨道
@@ -548,6 +567,42 @@ export function validateAnimation(animation) {
   try {
     const validatedAnimation = AnimationSchema.parse(animation);
     return { success: true, data: validatedAnimation, errors: null };
+  } catch (error) {
+    return { 
+      success: false, 
+      data: null, 
+      errors: error.errors || [{ message: error.message }] 
+    };
+  }
+}
+
+/**
+ * 验证动画数组配置
+ * @param {any} animations - 动画数组配置
+ * @returns {object} 验证结果
+ */
+export function validateAnimations(animations) {
+  try {
+    const validatedAnimations = AnimationsArraySchema.parse(animations);
+    return { success: true, data: validatedAnimations, errors: null };
+  } catch (error) {
+    return { 
+      success: false, 
+      data: null, 
+      errors: error.errors || [{ message: error.message }] 
+    };
+  }
+}
+
+/**
+ * 验证关键帧配置
+ * @param {any} keyframe - 关键帧配置对象
+ * @returns {object} 验证结果
+ */
+export function validateKeyframe(keyframe) {
+  try {
+    const validatedKeyframe = KeyframeSchema.parse(keyframe);
+    return { success: true, data: validatedKeyframe, errors: null };
   } catch (error) {
     return { 
       success: false, 
