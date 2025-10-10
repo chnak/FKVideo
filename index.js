@@ -99,9 +99,11 @@ export class VideoMaker extends EventEmitter {
 // 导出元素类
 export { VideoElement } from "./elements/video.js";
 export { ImageElement } from "./elements/image.js";
-export { TextElement } from "./elements/text.js";
+export { TitleElement as TextElement } from "./elements/title.js";
 export { ShapeElement } from "./elements/shape.js";
 export { CompositionElement } from "./elements/composition.js";
+export { SubtitleElement } from "./elements/subtitle.js";
+export { AudioElement } from "./elements/audio.js";
 
 // 导出工具类
 export { Transition } from "./transitions/transition.js";
@@ -112,7 +114,7 @@ export {
   KeyframeAnimation,
   animationManager 
 } from "./animations/AnimationManager.js";
-export { Animation } from "./animations/animation.js";
+export { Animation } from "./animations/Animation.js";
 
 export { 
   AnimationBuilder, 
@@ -154,5 +156,51 @@ export {
   getAnimationManagerPresetNames,
   isMultiPropertyAnimation as isAnimationManagerMultiProperty
 } from "./utils/AnimationManagerPresets.js";
+
+// 导出 Schema 验证系统
+export {
+  // 基础类型
+  PositionValueSchema,
+  ColorValueSchema,
+  EasingTypeSchema,
+  TextAlignSchema,
+  TextBaselineSchema,
+  ImageFitSchema,
+  ShapeTypeSchema,
+  PositionTypeSchema,
+  GradientTypeSchema,
+  GradientDirectionSchema,
+  
+  // 元素 Schema
+  BaseElementSchema,
+  TextElementSchema,
+  SubtitleElementSchema,
+  TitleElementSchema,
+  ImageElementSchema,
+  VideoElementSchema,
+  AudioElementSchema,
+  ShapeElementSchema,
+  CompositionElementSchema,
+  ElementSchema,
+  
+  // 动画和过渡
+  AnimationSchema,
+  TransitionSchema,
+  
+  // 场景和轨道
+  SceneSchema,
+  TrackSchema,
+  
+  // 主配置
+  FKVideoConfigSchema,
+  MultiTrackBuilderConfigSchema,
+  
+  // 验证函数
+  validateFKVideoConfig,
+  validateMultiTrackBuilderConfig,
+  validateElement,
+  validateAnimation,
+  validateTransition
+} from "./schemas/FKVideoSchema.js";
 
 export default VideoMaker;

@@ -148,7 +148,7 @@ async function getAnimationManager() {
 }
 
 async function getAnimation() {
-  const { Animation } = await import("./animations/animation.js");
+  const { Animation } = await import("./animations/Animation.js");
   return Animation;
 }
 
@@ -233,6 +233,99 @@ async function getAnimationManagerPresets() {
   };
 }
 
+// 导出 Schema 验证系统
+async function getSchemaValidation() {
+  const {
+    // 基础类型
+    PositionValueSchema,
+    ColorValueSchema,
+    EasingTypeSchema,
+    TextAlignSchema,
+    TextBaselineSchema,
+    ImageFitSchema,
+    ShapeTypeSchema,
+    PositionTypeSchema,
+    GradientTypeSchema,
+    GradientDirectionSchema,
+    
+    // 元素 Schema
+    BaseElementSchema,
+    TextElementSchema,
+    SubtitleElementSchema,
+    TitleElementSchema,
+    ImageElementSchema,
+    VideoElementSchema,
+    AudioElementSchema,
+    ShapeElementSchema,
+    CompositionElementSchema,
+    ElementSchema,
+    
+    // 动画和过渡
+    AnimationSchema,
+    TransitionSchema,
+    
+    // 场景和轨道
+    SceneSchema,
+    TrackSchema,
+    
+    // 主配置
+    FKVideoConfigSchema,
+    MultiTrackBuilderConfigSchema,
+    
+    // 验证函数
+    validateFKVideoConfig,
+    validateMultiTrackBuilderConfig,
+    validateElement,
+    validateAnimation,
+    validateTransition
+  } = await import("./schemas/FKVideoSchema.js");
+  
+  return {
+    // 基础类型
+    PositionValueSchema,
+    ColorValueSchema,
+    EasingTypeSchema,
+    TextAlignSchema,
+    TextBaselineSchema,
+    ImageFitSchema,
+    ShapeTypeSchema,
+    PositionTypeSchema,
+    GradientTypeSchema,
+    GradientDirectionSchema,
+    
+    // 元素 Schema
+    BaseElementSchema,
+    TextElementSchema,
+    SubtitleElementSchema,
+    TitleElementSchema,
+    ImageElementSchema,
+    VideoElementSchema,
+    AudioElementSchema,
+    ShapeElementSchema,
+    CompositionElementSchema,
+    ElementSchema,
+    
+    // 动画和过渡
+    AnimationSchema,
+    TransitionSchema,
+    
+    // 场景和轨道
+    SceneSchema,
+    TrackSchema,
+    
+    // 主配置
+    FKVideoConfigSchema,
+    MultiTrackBuilderConfigSchema,
+    
+    // 验证函数
+    validateFKVideoConfig,
+    validateMultiTrackBuilderConfig,
+    validateElement,
+    validateAnimation,
+    validateTransition
+  };
+}
+
 module.exports = {
   VideoMaker,
   // 导出异步获取函数
@@ -249,7 +342,8 @@ module.exports = {
   getSceneTemplateManager,
   getMultiTrackBuilder,
   getAnimationPresets,
-  getAnimationManagerPresets
+  getAnimationManagerPresets,
+  getSchemaValidation
 };
 
 // 默认导出

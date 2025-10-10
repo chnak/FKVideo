@@ -135,9 +135,9 @@ const TitleElementSchema = BaseElementSchema.extend({
   textColor: ColorValueSchema.default('#ffffff'),
   color: ColorValueSchema.optional(), // 兼容性属性
   position: PositionTypeSchema.default('center'),
-  zoomDirection: z.string().optional(),
-  zoomAmount: z.number().min(0).default(0.2),
-  animate: z.array(z.any()).default([]),
+  // zoomDirection: z.string().optional(),
+  // zoomAmount: z.number().min(0).default(0.2),
+  // animate: z.array(z.any()).default([]),
   split: z.any().optional(),
   splitDelay: z.number().min(0).default(0.1),
   splitDuration: z.number().min(0).default(0.3),
@@ -190,7 +190,66 @@ const TitleElementSchema = BaseElementSchema.extend({
 
 // ========== 文本元素 ==========
 
-const TextElementSchema = TitleElementSchema;
+const TextElementSchema = BaseElementSchema.extend({
+  type: z.literal('text'),
+  text: z.string().default(''),
+  fontPath: z.string().optional(),
+  fontFamily: z.string().optional(),
+  fontSize: z.union([z.number(), z.string()]).default(24),
+  textColor: ColorValueSchema.default('#ffffff'),
+  color: ColorValueSchema.optional(), // 兼容性属性
+  position: PositionTypeSchema.default('center'),
+  // zoomDirection: z.string().optional(),
+  // zoomAmount: z.number().min(0).default(0.2),
+  split: z.any().optional(),
+  splitDelay: z.number().min(0).default(0.1),
+  splitDuration: z.number().min(0).default(0.3),
+  
+  // 阴影配置
+  shadow: z.any().optional(),
+  shadowColor: ColorValueSchema.default('#000000'),
+  shadowBlur: z.number().min(0).default(0),
+  shadowOffsetX: z.number().default(0),
+  shadowOffsetY: z.number().default(0),
+  
+  // 文本边框配置
+  stroke: z.any().optional(),
+  strokeColor: ColorValueSchema.default('#000000'),
+  strokeWidth: z.number().min(0).default(1),
+  
+  // 渐变填充配置
+  gradient: z.any().optional(),
+  gradientType: GradientTypeSchema.default('linear'),
+  gradientColors: z.array(ColorValueSchema).default(['#ff0000', '#0000ff']),
+  gradientDirection: GradientDirectionSchema.default('horizontal'),
+  
+  // 文字装饰配置
+  underline: z.boolean().default(false),
+  linethrough: z.boolean().default(false),
+  overline: z.boolean().default(false),
+  
+  // 文字发光效果
+  glow: z.any().optional(),
+  glowColor: ColorValueSchema.default('#ffffff'),
+  glowBlur: z.number().min(0).default(10),
+  
+  // 文字变形效果
+  skewX: z.number().default(0),
+  skewY: z.number().default(0),
+  
+  // 文字路径效果
+  textPath: z.any().optional(),
+  pathData: z.any().optional(),
+  
+  // 文字遮罩效果
+  textMask: z.any().optional(),
+  maskImage: z.any().optional(),
+  
+  // 打字机效果
+  typewriter: z.any().optional(),
+  typewriterSpeed: z.number().min(0).default(100),
+  typewriterDelay: z.number().min(0).default(0)
+});
 
 // ========== 图片元素 ==========
 
