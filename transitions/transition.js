@@ -18,14 +18,9 @@ const TransitionAliases = {
     "directional-down": { name: "directional", easing: "easeOutExpo", params: { direction: [0, 1] } },
     "directional-up": { name: "directional", easing: "easeOutExpo", params: { direction: [0, -1] } },
 };
-const AllTransitions = [...glTransitions.map((t) => t.name), ...Object.keys(TransitionAliases)];
+export const AllTransitions = [...glTransitions.map((t) => t.name), ...Object.keys(TransitionAliases)];
 
-// 为 random 过渡添加静态计数器
-let randomTransitionCounter = 0;
 
-function getRandomTransition() {
-    return AllTransitions[Math.floor(Math.random() * AllTransitions.length)];
-}
 export class Transition {
     name;
     duration;
