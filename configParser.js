@@ -1,6 +1,5 @@
 import { VideoElement } from "./elements/video.js";
 import { ImageElement } from "./elements/image.js";
-import { TextElement } from "./elements/text.js";
 import { TitleElement } from "./elements/title.js";
 import { SubtitleElement } from "./elements/subtitle.js";
 import { ShapeElement } from "./elements/shape.js";

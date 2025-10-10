@@ -8,15 +8,13 @@ export class TitleElement extends BaseElement {
   constructor(config) {
     super(config);
     this.text = config.text || '';
-    this.font = config.font;
     this.fontPath = config.fontPath;
     this.fontFamily = config.fontFamily;
     this.fontSize = config.fontSize || 72; // 添加 fontSize 参数，默认 72px
     this.textColor = config.textColor || config.color || '#ffffff';
     this.position = config.position || 'center';
-    this.zoomDirection = config.zoomDirection; // 不设置默认值，只有传入时才启用
-    this.zoomAmount = config.zoomAmount || 0.2;
-    this.animate = config.animate || [];
+    // this.zoomDirection = config.zoomDirection; // 不设置默认值，只有传入时才启用
+    // this.zoomAmount = config.zoomAmount || 0.2;
     this.split = config.split || null;
     this.splitDelay = config.splitDelay || 0.1;
     this.splitDuration = config.splitDuration || 0.3;
@@ -76,7 +74,6 @@ export class TitleElement extends BaseElement {
     if (!this.titleElement) {
       this.titleElement = await createTitleElement({
         text: this.text,
-        font: this.font,
         fontPath: this.fontPath,
         fontFamily: this.fontFamily,
         fontSize: this.fontSize, // 传递 fontSize 参数

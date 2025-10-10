@@ -15,7 +15,6 @@ export class SubtitleElement extends BaseElement {
     // });
     
     this.text = config.text || '';
-    this.font = config.font;
     this.fontPath = config.fontPath;
     this.fontFamily = config.fontFamily;
     this.fillColor = config.fillColor || '#ffffff';
@@ -53,13 +52,11 @@ export class SubtitleElement extends BaseElement {
     
     this.textElement = await createTextElement({
       text: this.text,
-      font: this.font,
       fontPath: this.fontPath,
       fontFamily: this.fontFamily,
       fillColor: this.fillColor,
       strokeColor: this.strokeColor,
       strokeWidth: this.strokeWidth,
-      textAlign: this.textAlign,
       textBaseline: this.textBaseline,
       lineHeight: this.lineHeight,
       maxWidth: this.maxWidth,

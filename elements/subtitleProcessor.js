@@ -97,16 +97,12 @@ export async function createTextElement(config) {
   
   const {
     text = "",
-    font = null,
     fontPath = null,
     fontFamily = null,
     fontSize = 48,
     textColor = "#ffffff",
     backgroundColor,
-    delay = 0,
-    speed = 1,
     padding = 10,
-    textAlign = "left",
     position = "bottom",
     x = 0,
     y = 0,

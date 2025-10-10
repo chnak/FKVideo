@@ -293,7 +293,6 @@ function processPresetAnimations(animations) {
 export async function createTitleElement(config) {
   const { 
     text, 
-    font, 
     fontPath,
     fontFamily,
     fontSize = 72, // 添加 fontSize 参数，默认 72px
@@ -303,8 +302,8 @@ export async function createTitleElement(config) {
     y, // 自定义 Y 坐标
     originX = "center", // 原点 X
     originY = "center", // 原点 Y
-    zoomDirection, // 不设置默认值，只有传入时才启用
-    zoomAmount = 0.2, 
+    // zoomDirection, // 不设置默认值，只有传入时才启用
+    // zoomAmount = 0.2, 
     animations = [], // 动画配置
     split = null, // 分割参数：'letter'、'word' 或 'line'
     splitDelay = 0.1, // 分割动画延迟
