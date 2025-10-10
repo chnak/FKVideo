@@ -376,7 +376,7 @@ const TransitionSchema = z.object({
   easing: EasingTypeSchema.default('easeInOut'),
   startTime: z.number().min(0).optional(),
   endTime: z.number().min(0).optional(),
-  params: z.record(z.any()).optional()
+  params: z.any().optional()
 });
 
 // ========== 场景配置 ==========
@@ -446,7 +446,7 @@ const FKVideoConfigSchema = z.object({
   scenes: z.array(SceneSchema).default([]),
   
   // 全局配置
-  defaults: z.record(z.any()).optional(),
+  defaults: z.any().optional(),
   
   // 临时目录
   tmpDir: z.string().optional()
