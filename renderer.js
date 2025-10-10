@@ -141,16 +141,19 @@ export class VideoRenderer {
       // 只有一个音频流，直接复制
       // console.log(`[Renderer] 只有一个音频流，直接复制`);
       const stream = audioStreams[0];
-      const args = [
+      const args = [];
+      
+      // 如果有延迟，添加延迟（必须在输入文件之前）
+      if (stream.start > 0) {
+        args.push('-itsoffset', stream.start.toString());
+      }
+      
+      // 添加输入文件和输出参数
+      args.push(
         '-i', stream.path,
         '-c:a', 'flac',
         '-y', mixedAudioPath
-      ];
-      
-      // 如果有延迟，添加延迟
-      if (stream.start > 0) {
-        args.splice(2, 0, '-itsoffset', stream.start.toString());
-      }
+      );
       
       // console.log(`[Renderer] 单音频复制命令:`, args);
       await ffmpeg(args);
