@@ -6,7 +6,6 @@ import glTransition from "gl-transition";
 import glTransitions from "gl-transitions";
 import ndarray from "ndarray";
 import * as easings from "../utils/easings.js";
-
 const { default: createTransition } = glTransition;
 const TransitionAliases = {
     // 方向性过渡效果
@@ -20,6 +19,10 @@ const TransitionAliases = {
     "directional-up": { name: "directional", easing: "easeOutExpo", params: { direction: [0, -1] } },
 };
 const AllTransitions = [...glTransitions.map((t) => t.name), ...Object.keys(TransitionAliases)];
+
+// 为 random 过渡添加静态计数器
+let randomTransitionCounter = 0;
+
 function getRandomTransition() {
     return AllTransitions[Math.floor(Math.random() * AllTransitions.length)];
 }
@@ -41,7 +44,10 @@ export class Transition {
         );
 
         if (options.name === "random") {
-            options.name = getRandomTransition();
+            // 为 random 过渡使用真正的随机选择
+            const randomIndex = Math.floor(Math.random() * AllTransitions.length);
+            options.name = AllTransitions[randomIndex];
+            this.name = options.name; // 更新实例的 name 属性
         }
         
         const aliasedTransition = options.name && TransitionAliases[options.name];
