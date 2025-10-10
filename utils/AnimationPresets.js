@@ -141,6 +141,10 @@ export function getAnimationPreset(presetName, overrides = {}) {
  * @returns {object} 过渡配置
  */
 export function getTransitionPreset(presetName, overrides = {}) {
+  if(presetName==='random'){
+    const randomPreset = Object.keys(TransitionPresets)[Math.floor(Math.random() * Object.keys(TransitionPresets).length)];
+    return getTransitionPreset(randomPreset, overrides);
+  }
   const preset = TransitionPresets[presetName];
   if (!preset) {
     throw new Error(`过渡预设 "${presetName}" 不存在`);
