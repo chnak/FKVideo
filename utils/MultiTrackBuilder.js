@@ -313,7 +313,7 @@ class Track {
 class Scene {
   constructor(sceneConfig, builder) {
     this.type = "composition";
-    this.duration = sceneConfig.duration || 5;
+    this.duration = sceneConfig.duration || 3;
     this.startTime = builder.currentTime;
     this.x = sceneConfig.x || '50%';
     this.y = sceneConfig.y || '50%';
@@ -916,9 +916,58 @@ export class MultiTrackBuilder {
   }
 
   /**
+   * 计算场景的自动时长
+   * @param {Object} scene 场景对象
+   * @returns {number} 计算出的时长
+   */
+  calculateSceneDuration(scene) {
+    if (scene.elements.length === 0) {
+      return scene.duration || 3; // 如果没有元素，使用默认时长
+    }
+    
+    let maxElementEndTime = 0;
+    
+    // 计算所有元素的最大结束时间
+    scene.elements.forEach(element => {
+      const elementEndTime = (element.startTime || 0) + (element.duration || 0);
+      maxElementEndTime = Math.max(maxElementEndTime, elementEndTime);
+    });
+    
+    // 如果计算出的时长大于当前场景时长，则更新
+    if (maxElementEndTime > (scene.duration || 0)) {
+      return maxElementEndTime;
+    }
+    
+    return scene.duration || 3;
+  }
+
+  /**
    * 构建视频配置
    */
   build() {
+    // 自动计算场景时长
+    this.scenes.forEach(scene => {
+      const calculatedDuration = this.calculateSceneDuration(scene);
+      if (calculatedDuration !== scene.duration) {
+        console.log(`[MultiTrackBuilder] 场景 ${scene.sceneIndex} 时长自动计算: ${scene.duration}s -> ${calculatedDuration}s`);
+        scene.duration = calculatedDuration;
+      }
+    });
+    
+    // 重新计算当前时间
+    this.currentTime = this.scenes.reduce((total, scene) => total + scene.duration, 0);
+    
+    // 自动计算轨道中场景的时长
+    this.tracks.forEach(track => {
+      track.scenes.forEach(scene => {
+        const calculatedDuration = this.calculateSceneDuration(scene);
+        if (calculatedDuration !== scene.duration) {
+          console.log(`[MultiTrackBuilder] 轨道场景 ${track.trackIndex}-${scene.sceneIndex} 时长自动计算: ${scene.duration}s -> ${calculatedDuration}s`);
+          scene.duration = calculatedDuration;
+        }
+      });
+    });
+    
     // 计算所有轨道的最大持续时间
     let maxDuration = this.currentTime;
     
