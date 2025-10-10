@@ -18,7 +18,12 @@ const TransitionAliases = {
     "directional-down": { name: "directional", easing: "easeOutExpo", params: { direction: [0, 1] } },
     "directional-up": { name: "directional", easing: "easeOutExpo", params: { direction: [0, -1] } },
 };
-export const AllTransitions = [...glTransitions.map((t) => t.name), ...Object.keys(TransitionAliases)];
+export const AllTransitions = [
+  ...glTransitions.map((t) => t.name), 
+  ...Object.keys(TransitionAliases),
+  'crossfade',  // 添加交叉淡化过渡
+  'random'      // 添加随机过渡
+];
 
 
 export class Transition {

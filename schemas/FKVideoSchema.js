@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { easingMap } from '../utils/easings.js';
+import { AllTransitions } from '../transitions/transition.js';
 
 // ========== 基础类型定义 ==========
 
@@ -370,7 +371,7 @@ const AnimationsArraySchema = z.array(AnimationSchema).default([]);
 // ========== 过渡效果配置 ==========
 
 const TransitionSchema = z.object({
-  name: z.string(),
+  name: z.enum(AllTransitions),
   duration: z.number().min(0).default(0.5),
   easing: EasingTypeSchema.default('easeInOut'),
   startTime: z.number().min(0).optional(),
