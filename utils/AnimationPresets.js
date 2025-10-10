@@ -14,16 +14,46 @@ import {
 export const AnimationPresets = AnimationManagerPresets;
 
 // ========== 过渡效果预设 ==========
+// 基于 transitions/transition.js 中支持的过渡效果
 
 export const TransitionPresets = {
-  // 淡入淡出过渡
+  // 基础过渡效果
   fade: {
     name: "fade",
     duration: 0.5,
     easing: "easeInOut"
   },
 
-  // 滑动过渡
+  // 方向性过渡效果
+  "directional-left": {
+    name: "directional",
+    duration: 0.5,
+    easing: "easeOutExpo",
+    params: { direction: [1, 0] }
+  },
+
+  "directional-right": {
+    name: "directional",
+    duration: 0.5,
+    easing: "easeOutExpo",
+    params: { direction: [-1, 0] }
+  },
+
+  "directional-down": {
+    name: "directional",
+    duration: 0.5,
+    easing: "easeOutExpo",
+    params: { direction: [0, 1] }
+  },
+
+  "directional-up": {
+    name: "directional",
+    duration: 0.5,
+    easing: "easeOutExpo",
+    params: { direction: [0, -1] }
+  },
+
+  // 滑动过渡效果
   slideLeft: {
     name: "slideLeft",
     duration: 0.5,
@@ -48,7 +78,7 @@ export const TransitionPresets = {
     easing: "easeInOut"
   },
 
-  // 缩放过渡
+  // 缩放过渡效果
   zoomIn: {
     name: "zoomIn",
     duration: 0.5,
@@ -61,28 +91,28 @@ export const TransitionPresets = {
     easing: "easeInOut"
   },
 
-  // 旋转过渡
+  // 旋转过渡效果
   rotate: {
     name: "rotate",
     duration: 0.5,
     easing: "easeInOut"
   },
 
-  // 翻转过渡
+  // 翻转过渡效果
   flip: {
     name: "flip",
     duration: 0.5,
     easing: "easeInOut"
   },
 
-  // 溶解过渡
+  // 溶解过渡效果
   dissolve: {
     name: "dissolve",
     duration: 0.5,
     easing: "easeInOut"
   },
 
-  // 擦除过渡
+  // 擦除过渡效果
   wipeLeft: {
     name: "wipeLeft",
     duration: 0.5,
@@ -103,6 +133,13 @@ export const TransitionPresets = {
 
   wipeDown: {
     name: "wipeDown",
+    duration: 0.5,
+    easing: "easeInOut"
+  },
+
+  // 随机过渡效果
+  random: {
+    name: "random",
     duration: 0.5,
     easing: "easeInOut"
   }

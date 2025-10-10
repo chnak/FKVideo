@@ -1,5 +1,5 @@
 import { VideoMaker } from "../index.js";
-import { getAnimationPreset, getTransitionPreset, AnimationPresets, TransitionPresets } from "./AnimationPresets.js";
+import { getAnimationPreset, AnimationPresets } from "./AnimationPresets.js";
 
 /**
  * 轨道类 - 支持链式调用的轨道对象
@@ -681,11 +681,21 @@ export class MultiTrackBuilder {
     let transition;
     
     if (typeof transitionConfig === 'string') {
-      // 预设过渡名称
-      transition = getTransitionPreset(transitionConfig, overrides);
+      // 预设过渡名称 - 创建过渡配置对象
+      transition = {
+        name: transitionConfig,
+        duration: 0.5,
+        easing: "easeInOut",
+        ...overrides
+      };
     } else if (typeof transitionConfig === 'object') {
-      // 过渡配置对象
-      transition = transitionConfig;
+      // 过渡配置对象 - 直接使用
+      transition = {
+        duration: 0.5,
+        easing: "easeInOut",
+        ...transitionConfig,
+        ...overrides
+      };
     } else {
       throw new Error('过渡配置必须是字符串或对象');
     }
@@ -985,24 +995,10 @@ export class MultiTrackBuilder {
   }
 
   /**
-   * 获取所有过渡预设名称
-   */
-  getTransitionPresetNames() {
-    return Object.keys(TransitionPresets);
-  }
-
-  /**
    * 获取动画预设
    */
   getAnimationPreset(presetName, overrides = {}) {
     return getAnimationPreset(presetName, overrides);
-  }
-
-  /**
-   * 获取过渡预设
-   */
-  getTransitionPreset(presetName, overrides = {}) {
-    return getTransitionPreset(presetName, overrides);
   }
 
   /**
