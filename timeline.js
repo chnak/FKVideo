@@ -266,43 +266,59 @@ export class Timeline {
     // 为每个过渡效果创建新的处理器
     let transitionProcessor;
     
-    // 检查是否为自定义过渡效果
-    if (CustomTransition.isCustomTransition(transition.name)) {
-      const customTransition = new CustomTransition({
-        name: transition.name || 'fade',
-        duration: transition.duration || 1,
-        easing: transition.easing || 'linear',
-        params: transition.params || {}
-      });
-      transitionProcessor = customTransition.create({
-        width: this.canvasWidth,
-        height: this.canvasHeight,
-        channels: 4
-      });
-    } else if (AdvancedCustomTransition.isAdvancedCustomTransition(transition.name)) {
-      const advancedCustomTransition = new AdvancedCustomTransition({
-        name: transition.name || 'fade',
-        duration: transition.duration || 1,
-        easing: transition.easing || 'linear',
-        params: transition.params || {}
-      });
-      transitionProcessor = advancedCustomTransition.create({
-        width: this.canvasWidth,
-        height: this.canvasHeight,
-        channels: 4
-      });
+    // 创建缓存键，确保 random 过渡在创建时就确定具体的过渡效果
+    const cacheKey = `${transition.name}_${transition.duration}_${JSON.stringify(transition.params || {})}`;
+    
+    // 如果已经有缓存的处理器，直接使用
+    if (this.transitionCache && this.transitionCache[cacheKey]) {
+      transitionProcessor = this.transitionCache[cacheKey];
     } else {
-      const standardTransition = new Transition({
-        name: transition.name || 'fade',
-        duration: transition.duration || 1,
-        easing: transition.easing || 'linear',
-        params: transition.params || {}
-      });
-      transitionProcessor = standardTransition.create({
-        width: this.canvasWidth,
-        height: this.canvasHeight,
-        channels: 4
-      });
+      // 创建新的处理器并缓存
+      if (!this.transitionCache) {
+        this.transitionCache = {};
+      }
+    
+      // 检查是否为自定义过渡效果
+      if (CustomTransition.isCustomTransition(transition.name)) {
+        const customTransition = new CustomTransition({
+          name: transition.name || 'fade',
+          duration: transition.duration || 1,
+          easing: transition.easing || 'linear',
+          params: transition.params || {}
+        });
+        transitionProcessor = customTransition.create({
+          width: this.canvasWidth,
+          height: this.canvasHeight,
+          channels: 4
+        });
+      } else if (AdvancedCustomTransition.isAdvancedCustomTransition(transition.name)) {
+        const advancedCustomTransition = new AdvancedCustomTransition({
+          name: transition.name || 'fade',
+          duration: transition.duration || 1,
+          easing: transition.easing || 'linear',
+          params: transition.params || {}
+        });
+        transitionProcessor = advancedCustomTransition.create({
+          width: this.canvasWidth,
+          height: this.canvasHeight,
+          channels: 4
+        });
+      } else {
+        const standardTransition = new Transition({
+          name: transition.name || 'fade',
+          duration: transition.duration || 1,
+          easing: transition.easing || 'linear',
+          params: transition.params || {}
+        });
+        transitionProcessor = standardTransition.create({
+          width: this.canvasWidth,
+          height: this.canvasHeight,
+          channels: 4
+        });
+      }
+      
+      // 缓存处理器
+      this.transitionCache[cacheKey] = transitionProcessor;
     }
     
     // 应用过渡效果
