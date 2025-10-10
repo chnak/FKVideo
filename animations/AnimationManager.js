@@ -130,6 +130,10 @@ export class AnimationManager {
    * @returns {Animation|Array<Animation>} 动画实例或动画数组（多属性动画）
    */
   applyPreset(presetName, options = {}) {
+    if(presetName==='random'){
+      const randomPreset = this.getAvailablePresets()[Math.floor(Math.random() * this.getAvailablePresets().length)];
+      return this.applyPreset(randomPreset, options);
+    }
     const preset = this.presets.get(presetName);
     if (!preset) {
       throw new Error(`预设动画 "${presetName}" 不存在`);
