@@ -21,7 +21,6 @@ const TransitionAliases = {
 export const AllTransitions = [
   ...glTransitions.map((t) => t.name), 
   ...Object.keys(TransitionAliases),
-  'crossfade',  // 添加交叉淡化过渡
   'random'      // 添加随机过渡
 ];
 
