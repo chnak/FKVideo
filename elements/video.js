@@ -26,6 +26,10 @@ export class VideoElement extends BaseElement {
     
     // 视频循环属性
     this.loop = config.loop || false; // 是否循环播放
+    
+    // 音频相关属性
+    this.mute = config.mute !== undefined ? config.mute : true; // 默认静音
+    this.volume = config.volume !== undefined ? config.volume : 1; // 音量控制
   }
 
   async initialize() {
@@ -44,8 +48,17 @@ export class VideoElement extends BaseElement {
         loop: this.loop,
         elementDuration: this.duration,
         containerWidth: this.canvasWidth,
-        containerHeight: this.canvasHeight
+        containerHeight: this.canvasHeight,
+        // 音频相关参数
+        mute: this.mute,
+        volume: this.volume
       });
+      
+      // 如果有音频流，保存音频路径
+      if (this.videoElement.audioStream && !this.mute) {
+        this.audioPath = this.videoElement.audioStream.path;
+        console.log(`[VideoElement] 视频音频路径: ${this.audioPath}`);
+      }
     }
   }
 
@@ -70,6 +83,40 @@ export class VideoElement extends BaseElement {
     }
     
     return null;
+  }
+  
+  /**
+   * 获取音频元素（如果视频不禁音）
+   */
+  async getAudioElements() {
+    if (this.mute) {
+      return [];
+    }
+    
+    // 如果还没有初始化，先初始化
+    if (!this.videoElement) {
+      await this.initialize();
+    }
+    
+    // 如果初始化后仍然没有音频路径，说明视频没有音频或提取失败
+    if (!this.audioPath) {
+      console.log(`[VideoElement] 视频 ${this.source} 没有音频轨道或音频提取失败`);
+      return [];
+    }
+    
+    // 创建一个临时的音频元素来代表视频的音频
+    const { AudioElement } = await import('./audio.js');
+    const audioElement = new AudioElement({
+      type: 'audio',
+      source: this.audioPath,
+      startTime: this.startTime || 0,
+      duration: this.duration || 0,
+      volume: this.volume,
+      canvasWidth: this.canvasWidth,
+      canvasHeight: this.canvasHeight
+    });
+    
+    return [audioElement];
   }
 
 

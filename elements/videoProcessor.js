@@ -19,7 +19,10 @@ export async function createVideoElement(config) {
     loop = false,
     elementDuration = 0,
     containerWidth = 1280,
-    containerHeight = 720
+    containerHeight = 720,
+    // 音频相关参数
+    mute = true,
+    volume = 1
   } = config;
   
   
@@ -64,9 +67,11 @@ export async function createVideoElement(config) {
     cutTo,
     speedFactor,
     framerate: fps,
-    scaleFilter
+    scaleFilter,
+    // 音频相关参数
+    mute,
+    volume
   });
-  
   
   const controller = new AbortController();
   const transform = rawVideoToFrames({
@@ -85,6 +90,19 @@ export async function createVideoElement(config) {
     forceKillAfterDelay: 1000,
     cancelSignal: controller.signal
   });
+  
+  // 如果不禁音，需要处理音频流
+  let audioStream = null;
+  if (!mute) {
+    // 创建音频流处理
+    audioStream = await createAudioStream({
+      source,
+      cutFrom,
+      cutTo,
+      speedFactor,
+      volume
+    });
+  }
   
   // 处理错误
   ps.catch((err) => {
@@ -135,6 +153,7 @@ export async function createVideoElement(config) {
   }
   
   return {
+    audioStream, // 添加音频流
     async readNextFrame(progress, canvas) {
       try {
         let rgba;
@@ -202,6 +221,87 @@ export async function createVideoElement(config) {
       }
       // 清理缓冲
       frameBuffer = [];
+      // 关闭音频流
+      if (audioStream) {
+        await audioStream.close();
+      }
+    }
+  };
+}
+
+/**
+ * 创建音频流处理器
+ * @param {Object} config - 配置
+ * @returns {Object} 音频流处理器
+ */
+async function createAudioStream({
+  source,
+  cutFrom,
+  cutTo,
+  speedFactor = 1,
+  volume = 1
+}) {
+  const { writeFileSync } = await import('fs');
+  const { join } = await import('path');
+  const { nanoid } = await import('nanoid');
+  
+  // 生成临时音频文件路径
+  const tempAudioPath = join(process.cwd(), 'output', `temp-audio-${nanoid()}.flac`);
+  
+  // 默认混合所有音频轨道
+  let filterComplex = '[0:a]amix=inputs=1';
+  if (volume !== 1) {
+    filterComplex += `,volume=${volume}`;
+  }
+  filterComplex += '[aout]';
+  
+  const args = [
+    '-nostdin',
+    ...(cutFrom ? ['-ss', cutFrom.toString()] : []),
+    '-i', source,
+    ...(cutTo ? ['-t', ((cutTo - cutFrom) * speedFactor).toString()] : []),
+    '-filter_complex', filterComplex,
+    '-map', '[aout]',
+    '-c:a', 'flac',
+    '-y', tempAudioPath
+  ];
+  
+  const controller = new AbortController();
+  
+  const ps = ffmpeg(args, {
+    encoding: "buffer",
+    buffer: false,
+    stdin: "ignore",
+    stdout: "pipe",
+    stderr: process.stderr,
+    forceKillAfterDelay: 1000,
+    cancelSignal: controller.signal
+  });
+  
+  // 处理错误
+  ps.catch((err) => {
+    if (!err.isCanceled) {
+      throw err;
+    }
+  });
+  
+  // 等待音频处理完成
+  await ps;
+  
+  return {
+    path: tempAudioPath,
+    controller,
+    async close() {
+      if (!ps.exitCode) {
+        controller.abort();
+      }
+      // 清理临时文件
+      try {
+        const { unlinkSync } = await import('fs');
+        unlinkSync(tempAudioPath);
+      } catch (error) {
+        // 忽略文件删除错误
+      }
     }
   };
 }

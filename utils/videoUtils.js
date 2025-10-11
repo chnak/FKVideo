@@ -149,7 +149,10 @@ export function buildVideoFFmpegArgs({
   speedFactor = 1,
   framerate,
   scaleFilter,
-  outputFormat = 'rawvideo'
+  outputFormat = 'rawvideo',
+  // 音频相关参数
+  mute = true,
+  volume = 1
 }) {
   const args = [
     '-nostdin',
@@ -164,6 +167,13 @@ export function buildVideoFFmpegArgs({
     '-f', outputFormat,
     '-'
   ];
+  
+  // 如果不禁音，需要修改输出格式以支持音频
+  if (!mute) {
+    // 对于视频处理，我们只处理视频流，音频流将在渲染器中单独处理
+    // 这里保持原始的视频流处理逻辑
+    console.log(`[VideoUtils] 视频音频配置: mute=${mute}, volume=${volume}`);
+  }
   
   return args;
 }
