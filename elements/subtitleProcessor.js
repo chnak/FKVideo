@@ -186,10 +186,13 @@ export async function createTextElement(config) {
       // 计算当前时间 - 修复时间计算问题
       const currentTime = time !== null && time !== undefined ? time : (progress * duration);
       const absoluteTime = isNaN(currentTime) ? (progress * duration) : currentTime;
+      
+      // 计算相对于字幕元素的时间
+      const relativeTime = absoluteTime - (config.startTime || 0);
 
       // 创建文本框
       const objects = [];
-      const textSegment = textSegments.find(item=>absoluteTime>=item.startTime&&absoluteTime<=item.endTime);
+      const textSegment = textSegments.find(item=>relativeTime>=item.startTime&&relativeTime<=item.endTime);
 
       if(textSegment){
         const textBox = createCenteredTextWithBackground(textSegment.text, {
@@ -212,7 +215,7 @@ export async function createTextElement(config) {
             volume: textSegment.volume,
             fadeIn: textSegment.fadeIn,
             fadeOut: textSegment.fadeOut,
-            startTime: (config.startTime || 0) + textSegment.startTime, // 字幕元素 startTime + 段 startTime
+            startTime: textSegment.startTime, // 使用相对时间，将在 composition.js 中转换为绝对时间
             duration: textSegment.duration
           });
           await segmentAudioElement.initialize();

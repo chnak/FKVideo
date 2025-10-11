@@ -255,6 +255,13 @@ export class CompositionElement extends BaseElement {
     // 获取直接的音频元素
     const directAudioElements = this.subElements.filter(element => element.type === 'audio');
     // console.log(`[CompositionElement] 直接音频元素数量: ${directAudioElements.length}`);
+    
+    // 为直接音频元素转换时间（相对时间 -> 绝对时间）
+    for (const audioElement of directAudioElements) {
+      if (audioElement.startTime !== undefined) {
+        audioElement.startTime = this.startTime + audioElement.startTime;
+      }
+    }
     audioElements.push(...directAudioElements);
     
     // 获取其他子元素中的音频元素
@@ -262,6 +269,14 @@ export class CompositionElement extends BaseElement {
       if (element.getAudioElements && typeof element.getAudioElements === 'function') {
         const elementAudioElements = await element.getAudioElements();
         // console.log(`[CompositionElement] 子元素 ${element.type} 返回 ${elementAudioElements.length} 个音频元素`);
+        
+        // 为子元素的音频元素转换时间（相对时间 -> 绝对时间）
+        for (const audioElement of elementAudioElements) {
+          if (audioElement.startTime !== undefined) {
+            audioElement.startTime = this.startTime + audioElement.startTime;
+          }
+        }
+        
         audioElements.push(...elementAudioElements);
       }
     }
