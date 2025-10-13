@@ -125,21 +125,17 @@ export class AudioElement extends BaseElement {
       }
     }
 
-    // 添加音量调整和音频标准化
-    let audioFilters = [];
-    
-    // 添加音量调整
-    if (this.volume !== 1.0) {
-      audioFilters.push(`volume=${this.volume}`);
-    }
-    
-    // 添加音频标准化（提高音量）
-    if (this.audioNorm) {
-      audioFilters.push(`loudnorm=I=-16:TP=-1.5:LRA=11`);
-    } else if (this.volume === 1.0) {
-      // 只有当用户没有设置音量时才添加默认增强
-      audioFilters.push(`volume=1.2`); // 适度的音量增强
-    }
+        // 添加音量调整和音频标准化
+        let audioFilters = [];
+        
+        // 参考 FFCreator 的处理方式：默认不处理音量，只有明确设置时才处理
+        if (this.volume !== 1.0) {
+          // 如果用户明确设置了音量，使用用户设置的值
+          audioFilters.push(`volume=${this.volume}`);
+        } else if (this.audioNorm) {
+          // 如果启用了音频标准化且用户没有设置音量，使用适度的音量增强
+          audioFilters.push(`volume=1.3`);
+        }
     
     if (audioFilters.length > 0) {
       const filterString = audioFilters.join(',');
@@ -167,17 +163,7 @@ export class AudioElement extends BaseElement {
       }
     }
 
-    // 添加音频标准化
-    if (this.audioNorm) {
-      const normFilter = `dynaudnorm=g=${this.audioNormGaussSize}:maxgain=${this.audioNormMaxGain}`;
-      if (args.includes("-filter:a")) {
-        const filterIndex = args.indexOf("-filter:a");
-        args[filterIndex + 1] = `${args[filterIndex + 1]},${normFilter}`;
-      } else {
-        args.push("-filter:a", normFilter);
-      }
-      //console.log(`[AudioElement] 添加音频标准化: ${normFilter}`);
-    }
+    // 音频标准化已在上面处理，这里不再重复添加
 
     args.push("-y", audioPath);
 

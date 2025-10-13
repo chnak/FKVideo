@@ -200,9 +200,9 @@ export class VideoRenderer {
         filterParts.push(filter);
       }
       
-      // 混合所有音频流
+      // 混合所有音频流 - 参考 FFCreator 使用 normalize=0 避免音量被等分
       const mixInputs = audioStreams.map((_, i) => `[a${i}]`).join('');
-      const mixFilter = `${mixInputs}amix=inputs=${audioStreams.length}:duration=longest:dropout_transition=0[aout]`;
+      const mixFilter = `${mixInputs}amix=inputs=${audioStreams.length}:duration=longest:dropout_transition=0:normalize=0[aout]`;
       filterParts.push(mixFilter);
       
       const args = [
