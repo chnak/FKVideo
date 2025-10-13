@@ -591,9 +591,29 @@ export class BaseElement {
         const adjustedTime = time - segmentDelay;
         objectTransform = this.getTransformAtTime(adjustedTime);
         
-        // 使用原始位置，因为分割文本的位置已经计算好了
-        objectLeft = originalLeft;
-        objectTop = originalTop;
+        // 处理 isOffset 动画的偏移效果
+        // 对于分割文本，isOffset 动画需要应用到每个分割段上
+        let offsetX = 0;
+        let offsetY = 0;
+        
+        for (const animation of this.animations) {
+          const animValue = animation.getValueAtTime(adjustedTime);
+          
+          if (animValue !== null && animation.isOffset) {
+            switch (animation.property) {
+              case 'x':
+                offsetX += animValue;
+                break;
+              case 'y':
+                offsetY += animValue;
+                break;
+            }
+          }
+        }
+        
+        // 使用原始位置加上偏移，因为分割文本的位置已经计算好了
+        objectLeft = originalLeft + offsetX;
+        objectTop = originalTop + offsetY;
       } else {
         // 普通文本：使用动画计算后的位置，而不是静态位置
         // 因为 originalLeft/originalTop 是相对于文本起始位置的偏移，而普通文本只有一个对象
