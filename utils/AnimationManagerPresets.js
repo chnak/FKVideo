@@ -243,9 +243,9 @@ export const AnimationManagerPresets = {
 
   // 溶解效果
   dissolve: [
-    { property: 'opacity', from: 0, to: 1, duration: 0.8, easing: 'easeInOut' },
-    { property: 'scaleX', from: 0.9, to: 1, duration: 0.8, easing: 'easeOut' },
-    { property: 'scaleY', from: 0.9, to: 1, duration: 0.8, easing: 'easeOut' }
+    { property: 'opacity', from: 0, to: 1, duration: 0.5, easing: 'easeInOut' },
+    { property: 'scaleX', from: 0.6, to: 1, duration: 0.5, easing: 'easeOut' },
+    { property: 'scaleY', from: 0.6, to: 1, duration: 0.5, easing: 'easeOut' }
   ],
 
   // 弹簧效果
