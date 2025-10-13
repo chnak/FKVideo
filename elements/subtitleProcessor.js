@@ -184,17 +184,34 @@ export async function createTextElement(config) {
 
     async readNextFrame(progress, canvas, time) {
       // 计算当前时间 - 修复时间计算问题
-      const currentTime = time !== null && time !== undefined ? time : (progress * duration);
-      const absoluteTime = isNaN(currentTime) ? (progress * duration) : currentTime;
+      // 如果 time 参数存在，说明是从 composition 调用的，需要转换为绝对时间
+      let absoluteTime;
+      if (time !== null && time !== undefined) {
+        // 从 composition 调用，time 是相对于 composition 的时间
+        // 需要加上字幕元素的 startTime 来得到绝对时间
+        absoluteTime = time + (config.startTime || 0);
+      } else {
+        // 从 composition 调用，progress 是相对于 composition 的时间
+        // 需要加上字幕元素的 startTime 来得到绝对时间
+        absoluteTime = progress + (config.startTime || 0);
+      }
       
-      // 计算相对于字幕元素的时间
-      const relativeTime = absoluteTime - (config.startTime || 0);
-
+      
       // 创建文本框
       const objects = [];
-      const textSegment = textSegments.find(item=>relativeTime>=item.startTime&&relativeTime<=item.endTime);
+      
+      // 检查当前时间是否在字幕元素的时间范围内
+      const subtitleStartTime = config.startTime || 0;
+      const subtitleEndTime = subtitleStartTime + duration;
+      
+      if (absoluteTime >= subtitleStartTime && absoluteTime <= subtitleEndTime) {
+        // 计算相对于字幕元素的时间
+        const relativeTime = (absoluteTime - subtitleStartTime)*duration;
+        
+        
+        const textSegment = textSegments.find(item=>relativeTime>=item.startTime&&relativeTime<=item.endTime);
 
-      if(textSegment){
+        if(textSegment){
         const textBox = createCenteredTextWithBackground(textSegment.text, {
           fontSize: finalFontSizeValue,
           fontFamily: finalFontFamily,
@@ -263,6 +280,7 @@ export async function createTextElement(config) {
           originalOriginY: textBox.originY,
           opacity: 1
         });
+        }
       }
 
       // 处理全局音频（如果有）

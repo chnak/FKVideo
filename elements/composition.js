@@ -71,6 +71,7 @@ export class CompositionElement extends BaseElement {
       try {
         // 检查子元素是否在当前时间范围内（使用相对时间）
         if (relativeTime >= element.startTime && relativeTime <= element.endTime) {
+          
           // 确保子元素已初始化
           if (!element.isInitialized) {
             await element.initialize();
