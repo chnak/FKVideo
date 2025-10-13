@@ -257,7 +257,8 @@ export class VideoRenderer {
         // 使用atempo滤镜调整音频速度
         args.push('-filter:a', `atempo=${this.playbackSpeed}`);
       }
-      args.push('-c:a', 'aac', '-b:a', '128k');
+      // 使用更高质量的音频编码参数
+      args.push('-c:a', 'aac', '-b:a', '192k', '-ar', '48000', '-ac', '2');
     }
 
     args.push('-y', this.config.outPath);

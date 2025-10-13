@@ -104,7 +104,8 @@ export class AudioElement extends BaseElement {
       "-sample_fmt", "s32",
       "-ar", "48000",
       "-map", "a:0",
-      "-c:a", "flac"
+      "-c:a", "flac",
+      "-compression_level", "0" // 最高质量压缩
     ];
 
     // 添加截取参数
@@ -124,17 +125,32 @@ export class AudioElement extends BaseElement {
       }
     }
 
+    // 添加音量调整和音频标准化
+    let audioFilters = [];
+    
     // 添加音量调整
     if (this.volume !== 1.0) {
-      const volumeFilter = `volume=${this.volume}`;
+      audioFilters.push(`volume=${this.volume}`);
+    }
+    
+    // 添加音频标准化（提高音量）
+    if (this.audioNorm) {
+      audioFilters.push(`loudnorm=I=-16:TP=-1.5:LRA=11`);
+    } else {
+      // 默认添加音量增强
+      audioFilters.push(`volume=1.5`); // 提高1.5倍音量
+    }
+    
+    if (audioFilters.length > 0) {
+      const filterString = audioFilters.join(',');
       if (args.includes("-filter:a")) {
         // 如果已有滤镜，合并
         const filterIndex = args.indexOf("-filter:a");
-        args[filterIndex + 1] = `${args[filterIndex + 1]},${volumeFilter}`;
+        args[filterIndex + 1] = `${args[filterIndex + 1]},${filterString}`;
       } else {
-        args.push("-filter:a", volumeFilter);
+        args.push("-filter:a", filterString);
       }
-      //console.log(`[AudioElement] 添加音量调整: volume=${this.volume}`);
+      //console.log(`[AudioElement] 添加音频滤镜: ${filterString}`);
     }
 
     // 添加淡入淡出效果
