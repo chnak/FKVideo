@@ -684,6 +684,24 @@ export class FabricSplitText {
   }
 
   /**
+   * 获取指定分割类型的纯文本数据（不包含 fabric.Text 对象）
+   */
+  getTextSegments(type = 'char') {
+    const segments = this.getSegments(type);
+    return segments.map(segment => ({
+      text: segment.text.text || segment.text, // 提取文本内容
+      char: segment.char,
+      index: segment.index,
+      isSpace: segment.isSpace,
+      isSymbol: segment.isSymbol,
+      width: segment.width,
+      height: segment.height,
+      x: segment.x,
+      y: segment.y
+    }));
+  }
+
+  /**
    * 设置字符间距
    */
   setCharSpacing(spacing) {

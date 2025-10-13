@@ -30,7 +30,7 @@ export const AnimationManagerPresets = {
     from: 0,
     to: 1,
     duration: 0.8,
-    easing: 'easeOut'
+    easing: 'easeIn'
   },
 
   zoomOut: {
@@ -66,7 +66,7 @@ export const AnimationManagerPresets = {
     from: -300,
     to: 0,
     duration: 0.8,
-    easing: 'easeOut',
+    easing: 'easeIn',
     isOffset: true
   },
 
@@ -75,7 +75,7 @@ export const AnimationManagerPresets = {
     from: 300,
     to: 0,
     duration: 0.8,
-    easing: 'easeOut',
+    easing: 'easeIn',
     isOffset: true
   },
 
@@ -84,7 +84,7 @@ export const AnimationManagerPresets = {
     from: -200,
     to: 0,
     duration: 0.8,
-    easing: 'easeOut',
+    easing: 'easeIn',
     isOffset: true
   },
 
@@ -93,7 +93,7 @@ export const AnimationManagerPresets = {
     from: 200,
     to: 0,
     duration: 0.8,
-    easing: 'easeOut',
+    easing: 'easeIn',
     isOffset: true
   },
 
@@ -103,7 +103,7 @@ export const AnimationManagerPresets = {
     from: 0,
     to: -300,
     duration: 0.8,
-    easing: 'easeIn',
+    easing: 'easeOut',
     isOffset: true,
     delay: -0.8  // 在元素结束前0.6秒开始
   },
@@ -113,7 +113,7 @@ export const AnimationManagerPresets = {
     from: 0,
     to: 300,
     duration: 0.8,
-    easing: 'easeIn',
+    easing: 'easeOut',
     isOffset: true,
     delay: -0.8  // 在元素结束前0.6秒开始
   },
@@ -123,7 +123,7 @@ export const AnimationManagerPresets = {
     from: 0,
     to: -200,
     duration: 0.8,
-    easing: 'easeIn',
+    easing: 'easeOut',
     isOffset: true,
     delay: -0.8  // 在元素结束前0.6秒开始
   },
@@ -133,7 +133,7 @@ export const AnimationManagerPresets = {
     from: 0,
     to: 200,
     duration: 0.8,
-    easing: 'easeIn',
+    easing: 'easeOut',
     isOffset: true,
     delay: -0.8  // 在元素结束前0.6秒开始
   },
@@ -282,12 +282,12 @@ export const AnimationManagerPresets = {
   superZoomIn: [
     { property: 'scaleX', from: 0, to: 1, duration: 0.8, easing: 'easeIn' },
     { property: 'scaleY', from: 0, to: 1, duration: 0.8, easing: 'easeIn' },
-    { property: 'opacity', from: 0, to: 1, duration: 0.8, easing: 'easeIn' }
+    { property: 'opacity', from: 0, to: 1, duration: 0.5, easing: 'easeIn' }
   ],
   superZoomOut: [
-    { property: 'scaleX', from: 1, to: 0, duration: 0.8, easing: 'easeOut', delay: -0.6 },
-    { property: 'scaleY', from: 1, to: 0, duration: 0.8, easing: 'easeOut', delay: -0.6 },
-    { property: 'opacity', from: 1, to: 0, duration: 0.8, easing: 'easeOut', delay: -0.4 }
+    { property: 'scaleX', from: 1, to: 0, duration: 0.8, easing: 'easeOut', delay: -0.8 },
+    { property: 'scaleY', from: 1, to: 0, duration: 0.8, easing: 'easeOut', delay: -0.8 },
+    { property: 'opacity', from: 1, to: 0, duration: 0.6, easing: 'easeOut', delay: -0.4 }
   ],
 
   // 超级滑入左侧

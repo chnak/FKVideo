@@ -499,9 +499,10 @@ export class BaseElement {
    * 创建完整的 frameData，包含所有必要的变换信息
    * @param {Object} rawFrameData - 原始帧数据
    * @param {Object} transform - 变换信息
+   * @param {number} time - 当前时间
    * @returns {Object} 完整的帧数据
    */
-  createCompleteFrameData(rawFrameData, transform) {
+  createCompleteFrameData(rawFrameData, transform, time) {
     if (!rawFrameData) return null;
     
     // 如果是 contain-blur 效果
@@ -515,7 +516,7 @@ export class BaseElement {
 
     // 如果是对象数组（新的架构）
     if (rawFrameData.objects && Array.isArray(rawFrameData.objects)) {
-      return this.processObjectArray(rawFrameData, transform);
+      return this.processObjectArray(rawFrameData, transform, time);
     }
 
     // 如果是分割文本，使用特殊的位置处理
@@ -551,9 +552,10 @@ export class BaseElement {
    * 处理对象数组 - 统一处理位置动画和渲染
    * @param {Object} rawFrameData - 包含对象数组的原始帧数据
    * @param {Object} transform - 变换信息
+   * @param {number} time - 当前时间
    * @returns {Object} 处理后的帧数据
    */
-  processObjectArray(rawFrameData, transform) {
+  processObjectArray(rawFrameData, transform, time) {
     const { objects, width, height, isSplitText, textLeft, textTop, textWidth, textHeight } = rawFrameData;
     
     // 获取位置属性
@@ -561,7 +563,7 @@ export class BaseElement {
     
     // 处理每个对象
     const processedObjects = objects.map(obj => {
-      const { type, fabricObject, originalLeft, originalTop, originalOriginX, originalOriginY } = obj;
+      const { type, fabricObject, originalLeft, originalTop, originalOriginX, originalOriginY, segmentDelay } = obj;
       
       // 如果是音频对象，直接返回，不需要 Fabric 处理
       if (type === 'audio') {
@@ -577,10 +579,19 @@ export class BaseElement {
       // 计算对象相对于整体元素的位置
       let objectLeft = originalLeft;
       let objectTop = originalTop;
+      let objectTransform = transform;
       
-      if (isSplitText) {
-        // 分割文本：对象位置已经是相对于文本起始位置的绝对位置
-        // originalLeft 和 originalTop 已经是正确的绝对位置，不需要再次计算
+      if (isSplitText && segmentDelay !== undefined) {
+        // 分割文本：需要根据分割段的延迟时间重新计算动画
+        // 计算分割段的相对时间
+        const segmentTime = time - (this.startTime + segmentDelay);
+        
+        // 为分割段重新计算变换，考虑 segmentDelay
+        // 对于分割文本，我们需要调整时间来计算正确的动画效果
+        const adjustedTime = time - segmentDelay;
+        objectTransform = this.getTransformAtTime(adjustedTime);
+        
+        // 使用原始位置，因为分割文本的位置已经计算好了
         objectLeft = originalLeft;
         objectTop = originalTop;
       } else {
@@ -594,13 +605,13 @@ export class BaseElement {
       fabricObject.set({
         left: objectLeft,
         top: objectTop,
-        scaleX: transform.scaleX,
-        scaleY: transform.scaleY,
-        angle: transform.rotation,
-        opacity: transform.opacity,
-        rotationX: transform.rotationX,
-        rotationY: transform.rotationY,
-        translateZ: transform.translateZ,
+        scaleX: objectTransform.scaleX,
+        scaleY: objectTransform.scaleY,
+        angle: objectTransform.rotation,
+        opacity: objectTransform.opacity,
+        rotationX: objectTransform.rotationX,
+        rotationY: objectTransform.rotationY,
+        translateZ: objectTransform.translateZ,
         originX: originalOriginX,
         originY: originalOriginY
       });

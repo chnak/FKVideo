@@ -374,23 +374,31 @@ export async function createTitleElement(config) {
       lineHeight: 1.2
     });
     
-    // 获取指定类型的分割数据
-    const segments = splitTextInstance.getSegments(split);
+    // 获取指定类型的分割数据（纯文本信息，不包含 fabric.Text 对象）
+    const segments = splitTextInstance.getTextSegments(split);
     
     textSegments = segments.map((segment, index) => {
+      // 计算每个字符的起始时间：从第一个字符开始累加
+      const segmentStartTime = index * splitDelay;
+      const segmentEndTime = segmentStartTime + splitDuration;
+      
       return {
-        text: segment.text,
+        text: segment.text, // 字符串文本
         index,
-        startTime: index * splitDelay,
-        endTime: index * splitDelay + splitDuration,
+        startTime: segmentStartTime,
+        endTime: segmentEndTime,
         width: segment.width,
         height: segment.height,
         x: segment.x,
         y: segment.y,
         isSpace: segment.isSpace || false,
+        char: segment.char, // 保存字符信息
+        isSymbol: segment.isSymbol || false, // 保存符号信息
         splitTextInstance: splitTextInstance // 保存 SplitText 实例引用
       };
     });
+
+
   }
   
   
@@ -464,15 +472,25 @@ export async function createTitleElement(config) {
           const segment = textSegments[i];
           // 计算分割动画进度
           // segment.startTime 和 segment.endTime 是相对于分割动画的延迟时间（秒）
-          // 使用绝对时间来计算分割动画进度
-          const absoluteTime = time || (progress * duration);
-          const segmentStartTime = segment.startTime;
-          const segmentEndTime = segment.endTime;
-          const segmentProgress = Math.max(0, Math.min(1, (absoluteTime - segmentStartTime) / (segmentEndTime - segmentStartTime)));
+          // 需要将分割时间转换为绝对时间
+          const elementStartTime = config.startTime || 0;
+          const segmentStartTime = elementStartTime + segment.startTime;
+          const segmentEndTime = elementStartTime + segment.endTime;
           
-          // if (i === 0) { // Only log for first segment to avoid spam
-          //   console.log(`[TitleProcessor] 分割文本段 ${i}: 绝对时间=${absoluteTime}, 段开始时间=${segmentStartTime}, 段结束时间=${segmentEndTime}, 段进度=${segmentProgress}`);
-          // }
+          // 使用绝对时间来计算分割动画进度
+          const absoluteTime = time || (elementStartTime + progress * duration);
+          
+          // 计算分割进度：当时间在段开始时间之前时，进度为0；在段结束时间之后时，进度为1
+          let segmentProgress = 0;
+          if (absoluteTime >= segmentStartTime) {
+            if (absoluteTime >= segmentEndTime) {
+              segmentProgress = 1; // 动画已完成
+            } else {
+              segmentProgress = (absoluteTime - segmentStartTime) / (segmentEndTime - segmentStartTime); // 动画进行中
+            }
+          }
+          
+            // 分割动画时序已正确：每个字符按 splitDelay 间隔依次出现
           
           
           if (segmentProgress > 0) {
@@ -495,114 +513,28 @@ export async function createTitleElement(config) {
                 segmentTop = currentY + segment.index * (finalFontSize * 1.5);
               }
             }
-            
-            // 处理分割文本的动画效果
+            // 分割文本的动画效果由 BaseElement 统一处理
+            // 这里只处理分割进度相关的效果
             let scaleX = 1, scaleY = 1, angle = 0, translateX = 0, translateY = 0;
             let rotationX = 0, rotationY = 0, rotationZ = 0, translateZ = 0;
-            let opacity = segmentProgress; // 默认使用分割进度作为透明度
-            let hasOpacityAnimation = false; // 标记是否有透明度动画
-            
-            if (animations && animations.length > 0) {
-              // 处理多个动画的组合
-              let scaleXAnimations = [];
-              let scaleYAnimations = [];
-              let rotationAnimations = [];
-              let opacityAnimations = [];
-              let translateXAnimations = [];
-              let translateYAnimations = [];
-              
-              // 收集所有动画值
-              for (const anim of animations) {
-                const absoluteTime = time || (progress * duration);
-                // 对于分割文本，需要调整动画时间，使其相对于段开始时间
-                const adjustedTime = absoluteTime - segmentStartTime;
-                const animValue = anim.getValueAtTime(adjustedTime);
-                
-                switch (anim.property) {
-                  case 'scaleX':
-                    scaleXAnimations.push(animValue);
-                    break;
-                  case 'scaleY':
-                    scaleYAnimations.push(animValue);
-                    break;
-                  case 'rotation':
-                  case 'rotationZ':
-                    rotationAnimations.push(animValue);
-                    break;
-                  case 'rotationX':
-                    rotationAnimations.push(animValue);
-                    break;
-                  case 'rotationY':
-                    rotationAnimations.push(animValue);
-                    break;
-                  case 'x':
-                    if (anim.isOffset) {
-                      translateXAnimations.push(animValue);
-                    } else {
-                      translateX = animValue;
-                    }
-                    break;
-                  case 'y':
-                    if (anim.isOffset) {
-                      translateYAnimations.push(animValue);
-                    } else {
-                      translateY = animValue;
-                    }
-                    break;
-                  case 'translateZ':
-                    translateZ = animValue;
-                    break;
-                  case 'opacity':
-                    opacityAnimations.push(animValue);
-                    hasOpacityAnimation = true;
-                    break;
-                }
-              }
-              
-              // 应用动画组合
-              if (scaleXAnimations.length > 0) {
-                // 对于缩放，使用乘法组合（bounceIn: 0→1, explodeOut: 1→1.5）
-                scaleX = scaleXAnimations.reduce((acc, val) => acc * val, 1);
-              }
-              if (scaleYAnimations.length > 0) {
-                scaleY = scaleYAnimations.reduce((acc, val) => acc * val, 1);
-              }
-              if (rotationAnimations.length > 0) {
-                // 对于旋转，使用加法组合
-                angle = rotationAnimations.reduce((acc, val) => acc + val, 0);
-                rotationZ = angle;
-              }
-              if (opacityAnimations.length > 0) {
-                // 对于透明度，使用乘法组合
-                opacity = opacityAnimations.reduce((acc, val) => acc * val, 1);
-                // console.log(`[TitleProcessor] 分割文本透明度动画值: ${opacity}`);
-              }
-              if (translateXAnimations.length > 0) {
-                translateX += translateXAnimations.reduce((acc, val) => acc + val, 0);
-              }
-              if (translateYAnimations.length > 0) {
-                translateY += translateYAnimations.reduce((acc, val) => acc + val, 0);
-              }
-            }
-            
-            // 如果没有透明度动画，使用分割进度作为透明度
-            if (!hasOpacityAnimation) {
-              opacity = segmentProgress;
-            } else {
-              // 如果有透明度动画，将动画值与分割进度相乘
-              opacity = opacity * segmentProgress;
-            }
+            let opacity = segmentProgress; // 使用分割进度作为透明度
             
             // 创建Fabric.js Text对象渲染分割文本片段
             const textContent = segment.char || (segment.text && segment.text.text) || segment.text || '';
             
-            // 计算文字尺寸用于渐变
-            const tempText = new fabric.Text(textContent, {
+            // 重新创建 fabric.Text 对象，避免 Canvas 冲突和重复定义问题
+            const textObj = new fabric.Text(textContent, {
               fontSize: finalFontSize,
-              fontFamily: finalFontFamily
+              fontFamily: finalFontFamily,
+              fill: textColor,
+              textAlign: 'left',
+              originX: 'left',
+              originY: 'top'
             });
-            const textWidth = tempText.getScaledWidth();
-            const textHeight = tempText.getScaledHeight();
+            
+            // 计算文字尺寸用于渐变
+            const textWidth = textObj.getScaledWidth();
+            const textHeight = textObj.getScaledHeight();
             
             // 创建渐变填充
             let fillColor = textColor;
@@ -613,9 +545,8 @@ export async function createTitleElement(config) {
               }
             }
             
-            const textObj = new fabric.Text(textContent, {
-              fontSize: finalFontSize,
-              fontFamily: finalFontFamily,
+            // 更新克隆的 fabric.Text 对象的属性
+            textObj.set({
               fill: fillColor,
               left: segmentLeft + translateX,
               top: segmentTop + translateY,
@@ -670,7 +601,10 @@ export async function createTitleElement(config) {
         const objects = [];
         
         // 收集所有文本对象
-        mainCanvas.forEachObject((obj) => {
+        mainCanvas.forEachObject((obj, index) => {
+          // 计算当前分割段的延迟时间
+          const segmentDelay = textSegments[index] ? textSegments[index].startTime : 0;
+          
           objects.push({
             type: 'text',
             fabricObject: obj,
@@ -678,7 +612,9 @@ export async function createTitleElement(config) {
             originalLeft: obj.left,
             originalTop: obj.top,
             originalOriginX: obj.originX,
-            originalOriginY: obj.originY
+            originalOriginY: obj.originY,
+            // 添加分割段的延迟时间信息
+            segmentDelay: segmentDelay
           });
         });
         
@@ -721,86 +657,7 @@ export async function createTitleElement(config) {
         let rotationX = 0, rotationY = 0, rotationZ = 0, translateZ = 0;
         let opacity = 1;
         
-        if (animations && animations.length > 0) {
-          // 处理多个动画的组合
-          let scaleXAnimations = [];
-          let scaleYAnimations = [];
-          let rotationAnimations = [];
-          let opacityAnimations = [];
-          let translateXAnimations = [];
-          let translateYAnimations = [];
-          
-          // 收集所有动画值
-          for (const anim of animations) {
-            const absoluteTime = time || (progress * duration);
-            const animValue = anim.getValueAtTime(absoluteTime);
-            
-            if (animValue !== null) {
-              switch (anim.property) {
-                case 'scaleX':
-                  scaleXAnimations.push(animValue);
-                  break;
-                case 'scaleY':
-                  scaleYAnimations.push(animValue);
-                  break;
-                case 'rotation':
-                case 'rotationZ':
-                  rotationAnimations.push(animValue);
-                  break;
-                case 'rotationX':
-                  rotationAnimations.push(animValue);
-                  break;
-                case 'rotationY':
-                  rotationAnimations.push(animValue);
-                  break;
-                case 'x':
-                  if (anim.isOffset) {
-                    translateXAnimations.push(animValue);
-                  } else {
-                    translateX = animValue;
-                  }
-                  break;
-                case 'y':
-                  if (anim.isOffset) {
-                    translateYAnimations.push(animValue);
-                  } else {
-                    translateY = animValue;
-                  }
-                  break;
-                case 'translateZ':
-                  translateZ = animValue;
-                  break;
-                case 'opacity':
-                  opacityAnimations.push(animValue);
-                  break;
-              }
-            }
-          }
-          
-          // 应用动画组合
-          if (scaleXAnimations.length > 0) {
-            // 对于缩放，使用乘法组合（bounceIn: 0→1, explodeOut: 1→1.5）
-            scaleX = scaleXAnimations.reduce((acc, val) => acc * val, 1);
-          }
-          if (scaleYAnimations.length > 0) {
-            scaleY = scaleYAnimations.reduce((acc, val) => acc * val, 1);
-          }
-          if (rotationAnimations.length > 0) {
-            // 对于旋转，使用加法组合
-            angle = rotationAnimations.reduce((acc, val) => acc + val, 0);
-            rotationZ = angle;
-          }
-          if (opacityAnimations.length > 0) {
-            // 对于透明度，使用乘法组合
-            opacity = opacityAnimations.reduce((acc, val) => acc * val, 1);
-          }
-          if (translateXAnimations.length > 0) {
-            translateX += translateXAnimations.reduce((acc, val) => acc + val, 0);
-          }
-          if (translateYAnimations.length > 0) {
-            translateY += translateYAnimations.reduce((acc, val) => acc + val, 0);
-          }
-        }
+            // 动画效果由 BaseElement 统一处理，这里不需要重复处理
         
         // 创建渐变填充
         let fillColor = textColor;

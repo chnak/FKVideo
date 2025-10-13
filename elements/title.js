@@ -153,7 +153,7 @@ export class TitleElement extends BaseElement {
       if (frameData.height) this.height = frameData.height;
       
       // 创建完整的帧数据，包含所有变换信息
-      return this.createCompleteFrameData(frameData, transform);
+      return this.createCompleteFrameData(frameData, transform, time);
     }
     
     return null;
