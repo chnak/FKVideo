@@ -194,9 +194,10 @@ export const AnimationManagerPresets = {
 
   // 摇摆效果
   swing: [
-    { property: 'rotation', from: -15, to: 15, duration: 0.3, easing: 'easeInOut' },
-    { property: 'rotation', from: 15, to: 0, duration: 0.3, easing: 'easeInOut', delay: 0.3 },
-    { property: 'x', from: -5, to: 5, duration: 0.6, easing: 'easeInOut', isOffset: true }
+    { property: 'rotation', from: -15, to: 15, duration: 0.6, easing: 'easeInOut' },
+    { property: 'rotation', from: 15, to: -15, duration: 0.6, easing: 'easeInOut', delay: 0.6 },
+    { property: 'x', from: -50, to: 50, duration: 0.6, easing: 'easeInOut', isOffset: true },
+    { property: 'x', from: 50, to: -50, duration: 0.6, easing: 'easeInOut', isOffset: true, delay: 0.6 }
   ],
 
   // 震动效果
