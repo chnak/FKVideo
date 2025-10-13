@@ -127,7 +127,8 @@ export class TitleElement extends BaseElement {
         // 传递打字机效果配置
         typewriter: this.typewriter,
         typewriterSpeed: this.typewriterSpeed,
-        typewriterDelay: this.typewriterDelay
+        typewriterDelay: this.typewriterDelay,
+        animations: this.animations
       });
     }
   }

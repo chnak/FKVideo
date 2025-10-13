@@ -355,7 +355,6 @@ export async function createTitleElement(config) {
   const finalFontSize = fontResult.fontSize;
   
   
-  
   // 如果启用了分割动画，创建分割后的文本片段
   let textSegments = [];
   if (split) {
@@ -398,6 +397,12 @@ export async function createTitleElement(config) {
       };
     });
 
+    for(const animation of animations){
+      if(animation.delay<0){
+        const delay_time=splitDelay*segments.length;
+        animation.delay-=delay_time;
+      }
+    }
 
   }
   
