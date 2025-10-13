@@ -136,9 +136,9 @@ export class AudioElement extends BaseElement {
     // 添加音频标准化（提高音量）
     if (this.audioNorm) {
       audioFilters.push(`loudnorm=I=-16:TP=-1.5:LRA=11`);
-    } else {
-      // 默认添加音量增强
-      audioFilters.push(`volume=1.5`); // 提高1.5倍音量
+    } else if (this.volume === 1.0) {
+      // 只有当用户没有设置音量时才添加默认增强
+      audioFilters.push(`volume=1.2`); // 适度的音量增强
     }
     
     if (audioFilters.length > 0) {
