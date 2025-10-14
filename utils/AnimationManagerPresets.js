@@ -240,8 +240,8 @@ export const AnimationManagerPresets = {
   explodeIn: [
     { property: 'scaleX', from: 0, to: 1.2, duration: 0.3, easing: 'easeOut' },
     { property: 'scaleY', from: 0, to: 1.2, duration: 0.3, easing: 'easeOut' },
-    { property: 'scaleX', from: 1.2, to: 1, duration: 0.2, easing: 'easeIn', delay: 0.3 },
-    { property: 'scaleY', from: 1.2, to: 1, duration: 0.2, easing: 'easeIn', delay: 0.3 },
+    { property: 'scaleX', from: 1.2, to: 1, duration: 0.3, easing: 'easeIn', delay: 0.3 },
+    { property: 'scaleY', from: 1.2, to: 1, duration: 0.3, easing: 'easeIn', delay: 0.3 },
     { property: 'rotation', from: 0, to: 360, duration: 0.5, easing: 'easeOut' },
     { property: 'opacity', from: 0, to: 1, duration: 0.3, easing: 'easeOut' }
   ],
@@ -346,10 +346,10 @@ export const AnimationManagerPresets = {
 
   // 超级弹跳进入
   superBounceIn: [
-    { property: 'scaleX', from: 0, to: 1.2, duration: 0.4, easing: 'easeOut' },
-    { property: 'scaleY', from: 0, to: 1.2, duration: 0.4, easing: 'easeOut' },
-    { property: 'scaleX', from: 1.2, to: 0.9, duration: 0.2, easing: 'easeIn', delay: 0.4 },
-    { property: 'scaleY', from: 1.2, to: 0.9, duration: 0.2, easing: 'easeIn', delay: 0.4 },
+    { property: 'scaleX', from: 0, to: 1, duration: 0.4, easing: 'easeOut' },
+    { property: 'scaleY', from: 0, to: 1, duration: 0.4, easing: 'easeOut' },
+    { property: 'scaleX', from: 1, to: 0.9, duration: 0.2, easing: 'easeIn', delay: 0.4 },
+    { property: 'scaleY', from: 1, to: 0.9, duration: 0.2, easing: 'easeIn', delay: 0.4 },
     { property: 'scaleX', from: 0.9, to: 1, duration: 0.2, easing: 'easeOut', delay: 0.6 },
     { property: 'scaleY', from: 0.9, to: 1, duration: 0.2, easing: 'easeOut', delay: 0.6 },
     { property: 'opacity', from: 0, to: 1, duration: 0.3, easing: 'easeOut' }
