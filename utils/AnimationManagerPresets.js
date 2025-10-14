@@ -237,7 +237,7 @@ export const AnimationManagerPresets = {
   ],
 
   // 爆炸效果
-  explode: [
+  explodeIn: [
     { property: 'scaleX', from: 0, to: 1.2, duration: 0.3, easing: 'easeOut' },
     { property: 'scaleY', from: 0, to: 1.2, duration: 0.3, easing: 'easeOut' },
     { property: 'scaleX', from: 1.2, to: 1, duration: 0.2, easing: 'easeIn', delay: 0.3 },
@@ -246,15 +246,30 @@ export const AnimationManagerPresets = {
     { property: 'opacity', from: 0, to: 1, duration: 0.3, easing: 'easeOut' }
   ],
 
+  // 爆炸退出效果
+  explodeOut: [
+    { property: 'scaleX', from: 1, to: 1.5, duration: 0.4, easing: 'easeIn', delay: -0.6 },
+    { property: 'scaleY', from: 1, to: 1.5, duration: 0.4, easing: 'easeIn', delay: -0.6 },
+    { property: 'rotation', from: 0, to: 360, duration: 0.6, easing: 'easeIn', delay: -0.6 },
+    { property: 'opacity', from: 1, to: 0, duration: 0.6, easing: 'easeIn', delay: -0.6 }
+  ],
+
   // 溶解效果
-  dissolve: [
+  dissolveIn: [
     { property: 'opacity', from: 0, to: 1, duration: 0.5, easing: 'easeInOut' },
     { property: 'scaleX', from: 0.6, to: 1, duration: 0.5, easing: 'easeOut' },
     { property: 'scaleY', from: 0.6, to: 1, duration: 0.5, easing: 'easeOut' }
   ],
 
+  // 溶解退出效果
+  dissolveOut: [
+    { property: 'opacity', from: 1, to: 0, duration: 0.8, easing: 'easeIn', delay: -0.8 },
+    { property: 'scaleX', from: 1, to: 0.9, duration: 0.8, easing: 'easeIn', delay: -0.8 },
+    { property: 'scaleY', from: 1, to: 0.9, duration: 0.8, easing: 'easeIn', delay: -0.8 }
+  ],
+
   // 弹簧效果
-  spring: [
+  springIn: [
     { property: 'scaleX', from: 0, to: 1, duration: 0.8, easing: 'spring' },
     { property: 'scaleY', from: 0, to: 1, duration: 0.8, easing: 'spring' },
     { property: 'opacity', from: 0, to: 1, duration: 0.4, easing: 'easeOut' }
@@ -267,20 +282,9 @@ export const AnimationManagerPresets = {
     { property: 'opacity', from: 1, to: 0, duration: 0.4, easing: 'easeIn', delay: -0.4 }
   ],
 
-  // 爆炸退出效果
-  explodeOut: [
-    { property: 'scaleX', from: 1, to: 1.5, duration: 0.4, easing: 'easeIn', delay: -0.6 },
-    { property: 'scaleY', from: 1, to: 1.5, duration: 0.4, easing: 'easeIn', delay: -0.6 },
-    { property: 'rotation', from: 0, to: 360, duration: 0.6, easing: 'easeIn', delay: -0.6 },
-    { property: 'opacity', from: 1, to: 0, duration: 0.6, easing: 'easeIn', delay: -0.6 }
-  ],
+  
 
-  // 溶解退出效果
-  dissolveOut: [
-    { property: 'opacity', from: 1, to: 0, duration: 0.8, easing: 'easeIn', delay: -0.8 },
-    { property: 'scaleX', from: 1, to: 0.9, duration: 0.8, easing: 'easeIn', delay: -0.8 },
-    { property: 'scaleY', from: 1, to: 0.9, duration: 0.8, easing: 'easeIn', delay: -0.8 }
-  ],
+ 
 
   // ========== 现代多属性动画 ==========
 
