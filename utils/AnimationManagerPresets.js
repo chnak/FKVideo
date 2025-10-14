@@ -174,6 +174,11 @@ export const AnimationManagerPresets = {
     { property: 'scaleY', from: 0, to: 1, duration: 0.8, easing: 'elastic' },
     { property: 'opacity', from: 0, to: 1, duration: 0.4, easing: 'easeOut' }
   ],
+  elasticOut: [
+    { property: 'scaleX', from: 1, to: 0, duration: 0.8, easing: 'elastic', delay: -0.8 },
+    { property: 'scaleY', from: 1, to: 0, duration: 0.8, easing: 'elastic', delay: -0.8 },
+    { property: 'opacity', from: 1, to: 0, duration: 0.4, easing: 'easeIn', delay: -0.4 }
+  ],
 
   // 3D 翻转效果
   flip3D: [
