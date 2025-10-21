@@ -95,6 +95,10 @@ function splitText(text, maxLength = MAX_LENGTH) {
       else if (end < seg.length && isSplittingEnglishWord(seg, end)) {
         end = findSafeSplitPoint(seg, start, end, maxLength);
       }
+      // 新增：避免分割emoji字符
+      else if (end < seg.length && isSplittingEmoji(seg, end)) {
+        end = findSafeSplitPointForEmoji(seg, start, end, maxLength);
+      }
       
       chunks.push(seg.slice(start, end));
       start = end;
@@ -116,6 +120,44 @@ function isSplittingEnglishWord(text, position) {
   
   // 如果前后字符都是英文字母，说明正在分割单词
   return /[a-zA-Z]/.test(prevChar) && /[a-zA-Z]/.test(currChar);
+}
+
+// 新增辅助函数：检查是否正在分割emoji字符
+function isSplittingEmoji(text, position) {
+  if (position === 0 || position >= text.length) return false;
+  
+  // 检查当前位置是否在emoji字符的中间
+  // emoji字符的Unicode范围很广，这里使用更通用的检测方法
+  const char = text[position];
+  const prevChar = text[position - 1];
+  
+  // 检查是否为emoji字符（包括各种Unicode范围）
+  const isEmoji = /[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F900}-\u{1F9FF}]|[\u{1F018}-\u{1F0FF}]|[\u{1F200}-\u{1F2FF}]|[\u{1FA70}-\u{1FAFF}]/u.test(char);
+  const isPrevEmoji = /[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F900}-\u{1F9FF}]|[\u{1F018}-\u{1F0FF}]|[\u{1F200}-\u{1F2FF}]|[\u{1FA70}-\u{1FAFF}]/u.test(prevChar);
+  
+  return isEmoji || isPrevEmoji;
+}
+
+// 新增辅助函数：为emoji查找安全的分割点
+function findSafeSplitPointForEmoji(text, start, proposedEnd, maxLength) {
+  let end = proposedEnd;
+  
+  // 方案1：向前查找空格或标点
+  for (let i = end - 1; i > start; i--) {
+    if (text[i] === ' ' || /[，。！？、,.;!?]/.test(text[i])) {
+      return i + 1; // 在空格或标点后分割
+    }
+  }
+  
+  // 方案2：如果找不到空格，尝试在emoji前分割
+  for (let i = end - 1; i > start; i--) {
+    if (!isSplittingEmoji(text, i)) {
+      return i;
+    }
+  }
+  
+  // 方案3：如果都找不到，就在原位置分割
+  return proposedEnd;
 }
 
 // 新增辅助函数：查找安全的分割点
