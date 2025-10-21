@@ -128,6 +128,31 @@ class Track {
   }
 
   /**
+   * 添加视频
+   */
+  addVideo(config = {}) {
+    const video = this.builder.createVideo({
+      source: config.source,
+      x: config.x || '50%',
+      y: config.y || '50%',
+      width: config.width || '100%',
+      height: config.height || '100%',
+      fit: config.fit || 'cover',
+      duration: config.duration || this.duration,
+      startTime: config.startTime || 0,
+      zIndex: config.zIndex || 1,
+      volume: config.volume || 1,
+      loop: config.loop || false,
+      fadeIn: config.fadeIn || 0,
+      fadeOut: config.fadeOut || 0,
+      ...config
+    });
+    
+    this.elements.push(video);
+    return this;
+  }
+
+  /**
    * 添加音频
    */
   addAudio(config = {}) {
@@ -460,6 +485,31 @@ class Scene {
     });
     
     this.elements.push(shape);
+    return this;
+  }
+
+  /**
+   * 添加视频
+   */
+  addVideo(config = {}) {
+    const video = this.builder.createVideo({
+      source: config.source,
+      x: config.x || '50%',
+      y: config.y || '50%',
+      width: config.width || '100%',
+      height: config.height || '100%',
+      fit: config.fit || 'cover',
+      duration: config.duration || this.duration,
+      startTime: config.startTime || 0,
+      zIndex: config.zIndex || 1,
+      volume: config.volume || 1,
+      loop: config.loop || false,
+      fadeIn: config.fadeIn || 0,
+      fadeOut: config.fadeOut || 0,
+      ...config
+    });
+    
+    this.elements.push(video);
     return this;
   }
 
@@ -798,6 +848,29 @@ export class MultiTrackBuilder {
       duration: config.duration || 5,
       startTime: config.startTime || 0,
       zIndex: config.zIndex || 1,
+      ...config
+    };
+  }
+
+  /**
+   * 创建视频元素
+   */
+  createVideo(config = {}) {
+    return {
+      type: "video",
+      source: config.source,
+      x: config.x || '50%',
+      y: config.y || '50%',
+      width: config.width || '100%',
+      height: config.height || '100%',
+      fit: config.fit || 'cover',
+      duration: config.duration || 5,
+      startTime: config.startTime || 0,
+      zIndex: config.zIndex || 1,
+      volume: config.volume || 1,
+      loop: config.loop || false,
+      fadeIn: config.fadeIn || 0,
+      fadeOut: config.fadeOut || 0,
       ...config
     };
   }
