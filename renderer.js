@@ -143,21 +143,25 @@ export class VideoRenderer {
       const stream = audioStreams[0];
       const args = [];
       
-      // 如果有延迟，添加延迟（必须在输入文件之前）
+      // 添加输入文件
+      args.push('-i', stream.path);
+      
+      // 如果有延迟，使用 adelay 滤镜
       if (stream.start > 0) {
-        args.push('-itsoffset', stream.start.toString());
+        const delayMs = Math.round(stream.start * 1000); // 转换为毫秒
+        args.push('-af', `adelay=${delayMs}:all=1`);
+        // console.log(`[Renderer] 添加音频延迟: ${stream.start}s (${delayMs}ms)`);
       }
       
-      // 添加输入文件和输出参数
+      // 添加输出参数
       args.push(
-        '-i', stream.path,
         '-c:a', 'flac',
         '-y', mixedAudioPath
       );
       
-      // console.log(`[Renderer] 单音频复制命令:`, args);
+      // console.log(`[Renderer] 单音频处理命令:`, args);
       await ffmpeg(args);
-      // console.log(`[Renderer] 单音频复制完成`);
+      // console.log(`[Renderer] 单音频处理完成`);
     } else {
       // 多个音频流，使用 filter_complex 处理延迟
       // console.log(`[Renderer] 使用 filter_complex 处理 ${audioStreams.length} 个音频流`);
