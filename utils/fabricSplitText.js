@@ -289,7 +289,8 @@ export class FabricSplitText {
    */
   _createCharacters() {
     this.characters = [];
-    const chars = this.text.split('');
+    // 使用正确的Unicode字符分割方法，支持emoji
+    const chars = Array.from(this.text);
     
     for (let i = 0; i < chars.length; i++) {
       const char = chars[i];
