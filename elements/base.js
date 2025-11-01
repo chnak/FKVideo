@@ -226,10 +226,17 @@ export class BaseElement {
     let translateXAnimations = [];
     let translateYAnimations = [];
     
+    // 用于记录 scale 动画的时间信息，以便找出当前时间最合适的动画
+    let scaleXAnimationsWithTime = [];
+    let scaleYAnimationsWithTime = [];
+    
     // 收集所有动画值
     for (const animation of this.animations) {
       const animValue = animation.getValueAtTime(time);
       
+      // 计算动画的实际开始和结束时间
+      const actualStartTime = (animation.startTime || 0) + (animation.delay || 0);
+      const actualEndTime = actualStartTime + animation.duration;
       
       if (animValue !== null) {
         switch (animation.property) {
@@ -249,9 +256,23 @@ export class BaseElement {
             break;
           case 'scaleX':
             scaleXAnimations.push(animValue);
+            // 记录动画的时间信息：开始时间、结束时间、当前值
+            scaleXAnimationsWithTime.push({ 
+              value: animValue, 
+              startTime: actualStartTime,
+              endTime: actualEndTime,
+              animation: animation
+            });
             break;
           case 'scaleY':
             scaleYAnimations.push(animValue);
+            // 记录动画的时间信息
+            scaleYAnimationsWithTime.push({ 
+              value: animValue, 
+              startTime: actualStartTime,
+              endTime: actualEndTime,
+              animation: animation
+            });
             break;
           case 'rotation':
           case 'rotationZ':
@@ -274,12 +295,48 @@ export class BaseElement {
     }
     
     // 应用动画组合
-    if (scaleXAnimations.length > 0) {
-      // 对于缩放，使用乘法组合（bounceIn: 0→1, explodeOut: 1→1.5）
-      scaleX = scaleXAnimations.reduce((acc, val) => acc * val, 1);
+    if (scaleXAnimationsWithTime.length > 0) {
+      // 对于缩放，优先使用正在运行的动画（已开始但未结束）
+      // 如果没有正在运行的，使用已结束的动画中最晚结束的那个
+      const runningAnimations = scaleXAnimationsWithTime.filter(anim => 
+        anim.startTime <= time && time < anim.endTime
+      );
+      
+      if (runningAnimations.length > 0) {
+        // 有正在运行的动画，使用开始时间最晚的那个（最后开始的）
+        runningAnimations.sort((a, b) => b.startTime - a.startTime);
+        scaleX = runningAnimations[0].value;
+      } else {
+        // 没有正在运行的，找出已结束的动画
+        const endedAnimations = scaleXAnimationsWithTime.filter(anim => time >= anim.endTime);
+        if (endedAnimations.length > 0) {
+          // 使用结束时间最晚的动画的最终值
+          endedAnimations.sort((a, b) => b.endTime - a.endTime);
+          scaleX = endedAnimations[0].animation.to;
+        } else {
+          // 所有动画都还没开始，使用第一个动画的初始值
+          scaleX = scaleXAnimations[0];
+        }
+      }
     }
-    if (scaleYAnimations.length > 0) {
-      scaleY = scaleYAnimations.reduce((acc, val) => acc * val, 1);
+    if (scaleYAnimationsWithTime.length > 0) {
+      // 对于缩放，优先使用正在运行的动画
+      const runningAnimations = scaleYAnimationsWithTime.filter(anim => 
+        anim.startTime <= time && time < anim.endTime
+      );
+      
+      if (runningAnimations.length > 0) {
+        runningAnimations.sort((a, b) => b.startTime - a.startTime);
+        scaleY = runningAnimations[0].value;
+      } else {
+        const endedAnimations = scaleYAnimationsWithTime.filter(anim => time >= anim.endTime);
+        if (endedAnimations.length > 0) {
+          endedAnimations.sort((a, b) => b.endTime - a.endTime);
+          scaleY = endedAnimations[0].animation.to;
+        } else {
+          scaleY = scaleYAnimations[0];
+        }
+      }
     }
     if (rotationAnimations.length > 0) {
       // 对于旋转，使用加法组合

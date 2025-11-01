@@ -315,6 +315,158 @@ export const AnimationManagerPresets = {
     { property: 'opacity', from: 1, to: 0, duration: 0.6, easing: 'easeOut', delay: -0.4 }
   ],
 
+  // ========== 惊艳特效动画 ==========
+
+  // 强力弹性进入 - 更有冲击力的弹性效果
+  // 现在 scale 使用覆盖方式（最后一个动画的值生效），更直观易懂
+  powerBounceIn: [
+    { property: 'scaleX', from: 0, to: 1.3, duration: 0.4, easing: 'easeOutBack' },
+    { property: 'scaleY', from: 0, to: 1.3, duration: 0.4, easing: 'easeOutBack' },
+    { property: 'scaleX', from: 1.3, to: 0.5, duration: 0.4, easing: 'easeIn', delay: 0.4 },
+    { property: 'scaleY', from: 1.3, to: 0.5, duration: 0.4, easing: 'easeIn', delay: 0.4 },
+    { property: 'scaleX', from: 0.5, to: 1, duration: 0.4, easing: 'easeOut', delay: 0.8 },
+    { property: 'scaleY', from: 0.5, to: 1, duration: 0.2, easing: 'easeOut', delay: 0.8 },
+    { property: 'opacity', from: 0, to: 1, duration: 0.3, easing: 'easeOut' },
+    { property: 'rotation', from: -10, to: 0, duration: 0.6, easing: 'easeOutBack' }
+  ],
+
+  // 3D 翻转进入 - 卡片翻转效果
+  flip3DIn: [
+    { property: 'rotationX', from: -90, to: 0, duration: 0.8, easing: 'easeOutBack' },
+    { property: 'rotationY', from: 0, to: 0, duration: 0.8, easing: 'easeOutBack' },
+    { property: 'scaleX', from: 0.8, to: 1, duration: 0.8, easing: 'easeOut' },
+    { property: 'scaleY', from: 0.8, to: 1, duration: 0.8, easing: 'easeOut' },
+    { property: 'opacity', from: 0, to: 1, duration: 0.6, easing: 'easeOut' },
+    { property: 'translateZ', from: -200, to: 0, duration: 0.8, easing: 'easeOut' }
+  ],
+
+  // 3D 翻转退出
+  flip3DOut: [
+    { property: 'rotationX', from: 0, to: 90, duration: 0.8, easing: 'easeInBack', delay: -0.8 },
+    { property: 'rotationY', from: 0, to: 0, duration: 0.8, easing: 'easeInBack', delay: -0.8 },
+    { property: 'scaleX', from: 1, to: 0.8, duration: 0.8, easing: 'easeIn', delay: -0.8 },
+    { property: 'scaleY', from: 1, to: 0.8, duration: 0.8, easing: 'easeIn', delay: -0.8 },
+    { property: 'opacity', from: 1, to: 0, duration: 0.6, easing: 'easeIn', delay: -0.6 },
+    { property: 'translateZ', from: 0, to: -200, duration: 0.8, easing: 'easeIn', delay: -0.8 }
+  ],
+
+  // 弹性飞入 - 从远处弹入
+  elasticFlyIn: [
+    { property: 'x', from: -500, to: 0, duration: 1.0, easing: 'easeOutElastic', isOffset: true },
+    { property: 'y', from: -300, to: 0, duration: 1.0, easing: 'easeOutElastic', isOffset: true },
+    { property: 'scaleX', from: 0.3, to: 1, duration: 1.0, easing: 'easeOutElastic' },
+    { property: 'scaleY', from: 0.3, to: 1, duration: 1.0, easing: 'easeOutElastic' },
+    { property: 'rotation', from: -180, to: 0, duration: 1.0, easing: 'easeOutElastic' },
+    { property: 'opacity', from: 0, to: 1, duration: 0.5, easing: 'easeOut' }
+  ],
+
+  // 旋转弹入 - 旋转+弹跳组合
+  spinBounceIn: [
+    { property: 'rotation', from: -720, to: 0, duration: 1.0, easing: 'easeOutBounce' },
+    { property: 'scaleX', from: 0, to: 1.2, duration: 0.5, easing: 'easeOutBounce' },
+    { property: 'scaleY', from: 0, to: 1.2, duration: 0.5, easing: 'easeOutBounce' },
+    { property: 'scaleX', from: 1.2, to: 1, duration: 0.3, easing: 'easeIn', delay: 0.5 },
+    { property: 'scaleY', from: 1.2, to: 1, duration: 0.3, easing: 'easeIn', delay: 0.5 },
+    { property: 'opacity', from: 0, to: 1, duration: 0.4, easing: 'easeOut' }
+  ],
+
+  // 缩放旋转组合 - 更有节奏感
+  zoomSpinIn: [
+    { property: 'scaleX', from: 0, to: 1.5, duration: 0.3, easing: 'easeOutExpo' },
+    { property: 'scaleY', from: 0, to: 1.5, duration: 0.3, easing: 'easeOutExpo' },
+    { property: 'rotation', from: 180, to: 0, duration: 0.4, easing: 'easeOutBack' },
+    { property: 'scaleX', from: 1.5, to: 0.95, duration: 0.2, easing: 'easeIn', delay: 0.3 },
+    { property: 'scaleY', from: 1.5, to: 0.95, duration: 0.2, easing: 'easeIn', delay: 0.3 },
+    { property: 'scaleX', from: 0.95, to: 1, duration: 0.2, easing: 'easeOut', delay: 0.5 },
+    { property: 'scaleY', from: 0.95, to: 1, duration: 0.2, easing: 'easeOut', delay: 0.5 },
+    { property: 'opacity', from: 0, to: 1, duration: 0.3, easing: 'easeOutExpo' }
+  ],
+
+  // 脉冲放大进入 - 心跳效果
+  pulseIn: [
+    { property: 'scaleX', from: 0, to: 1.4, duration: 0.25, easing: 'easeOutExpo' },
+    { property: 'scaleY', from: 0, to: 1.4, duration: 0.25, easing: 'easeOutExpo' },
+    { property: 'opacity', from: 0, to: 1, duration: 0.2, easing: 'easeOutExpo' },
+    { property: 'scaleX', from: 1.4, to: 0.85, duration: 0.15, easing: 'easeIn', delay: 0.25 },
+    { property: 'scaleY', from: 1.4, to: 0.85, duration: 0.15, easing: 'easeIn', delay: 0.25 },
+    { property: 'scaleX', from: 0.85, to: 1.1, duration: 0.15, easing: 'easeOut', delay: 0.4 },
+    { property: 'scaleY', from: 0.85, to: 1.1, duration: 0.15, easing: 'easeOut', delay: 0.4 },
+    { property: 'scaleX', from: 1.1, to: 1, duration: 0.15, easing: 'easeIn', delay: 0.55 },
+    { property: 'scaleY', from: 1.1, to: 1, duration: 0.15, easing: 'easeIn', delay: 0.55 }
+  ],
+
+  // 滑入旋转 - 从侧面滑入并旋转
+  slideSpinIn: [
+    { property: 'x', from: 800, to: 0, duration: 0.8, easing: 'easeOutBack', isOffset: true },
+    { property: 'rotation', from: 360, to: 0, duration: 0.8, easing: 'easeOutBack' },
+    { property: 'scaleX', from: 0.5, to: 1, duration: 0.8, easing: 'easeOutBack' },
+    { property: 'scaleY', from: 0.5, to: 1, duration: 0.8, easing: 'easeOutBack' },
+    { property: 'opacity', from: 0, to: 1, duration: 0.6, easing: 'easeOut' }
+  ],
+
+  // 滑入旋转（左侧）
+  slideSpinInLeft: [
+    { property: 'x', from: -800, to: 0, duration: 0.8, easing: 'easeOutBack', isOffset: true },
+    { property: 'rotation', from: -360, to: 0, duration: 0.8, easing: 'easeOutBack' },
+    { property: 'scaleX', from: 0.5, to: 1, duration: 0.8, easing: 'easeOutBack' },
+    { property: 'scaleY', from: 0.5, to: 1, duration: 0.8, easing: 'easeOutBack' },
+    { property: 'opacity', from: 0, to: 1, duration: 0.6, easing: 'easeOut' }
+  ],
+
+  // 垂直弹入 - 从下方弹入
+  bounceUpIn: [
+    { property: 'y', from: 600, to: -50, duration: 0.6, easing: 'easeOutBounce', isOffset: true },
+    { property: 'y', from: -50, to: 0, duration: 0.3, easing: 'easeIn', delay: 0.6, isOffset: true },
+    { property: 'scaleX', from: 0.8, to: 1.1, duration: 0.5, easing: 'easeOutBounce' },
+    { property: 'scaleY', from: 0.8, to: 1.1, duration: 0.5, easing: 'easeOutBounce' },
+    { property: 'scaleX', from: 1.1, to: 1, duration: 0.2, easing: 'easeIn', delay: 0.5 },
+    { property: 'scaleY', from: 1.1, to: 1, duration: 0.2, easing: 'easeIn', delay: 0.5 },
+    { property: 'opacity', from: 0, to: 1, duration: 0.4, easing: 'easeOut' }
+  ],
+
+  // 缩放淡入 - 快速缩放+淡入
+  zoomFadeIn: [
+    { property: 'scaleX', from: 1.5, to: 1, duration: 0.6, easing: 'easeOutExpo' },
+    { property: 'scaleY', from: 1.5, to: 1, duration: 0.6, easing: 'easeOutExpo' },
+    { property: 'opacity', from: 0, to: 1, duration: 0.5, easing: 'easeOutExpo' }
+  ],
+
+  // 缩放淡出
+  zoomFadeOut: [
+    { property: 'scaleX', from: 1, to: 0.8, duration: 0.6, easing: 'easeInExpo', delay: -0.6 },
+    { property: 'scaleY', from: 1, to: 0.8, duration: 0.6, easing: 'easeInExpo', delay: -0.6 },
+    { property: 'opacity', from: 1, to: 0, duration: 0.5, easing: 'easeInExpo', delay: -0.5 }
+  ],
+
+  // 3D 旋转进入 - Y轴旋转
+  rotate3DYIn: [
+    { property: 'rotationY', from: -90, to: 0, duration: 0.9, easing: 'easeOutBack' },
+    { property: 'scaleX', from: 0.7, to: 1, duration: 0.9, easing: 'easeOut' },
+    { property: 'opacity', from: 0, to: 1, duration: 0.5, easing: 'easeOut' },
+    { property: 'translateZ', from: -300, to: 0, duration: 0.9, easing: 'easeOut' }
+  ],
+
+  // 3D 旋转退出 - Y轴旋转
+  rotate3DYOut: [
+    { property: 'rotationY', from: 0, to: 90, duration: 0.9, easing: 'easeInBack', delay: -0.9 },
+    { property: 'scaleX', from: 1, to: 0.7, duration: 0.9, easing: 'easeIn', delay: -0.9 },
+    { property: 'opacity', from: 1, to: 0, duration: 0.5, easing: 'easeIn', delay: -0.5 },
+    { property: 'translateZ', from: 0, to: -300, duration: 0.9, easing: 'easeIn', delay: -0.9 }
+  ],
+
+  // 弹性缩放进入 - 多次回弹
+  elasticScaleIn: [
+    { property: 'scaleX', from: 0, to: 1.25, duration: 0.5, easing: 'easeOutElastic' },
+    { property: 'scaleY', from: 0, to: 1.25, duration: 0.5, easing: 'easeOutElastic' },
+    { property: 'scaleX', from: 1.25, to: 0.9, duration: 0.3, easing: 'easeIn', delay: 0.5 },
+    { property: 'scaleY', from: 1.25, to: 0.9, duration: 0.3, easing: 'easeIn', delay: 0.5 },
+    { property: 'scaleX', from: 0.9, to: 1.05, duration: 0.25, easing: 'easeOut', delay: 0.8 },
+    { property: 'scaleY', from: 0.9, to: 1.05, duration: 0.25, easing: 'easeOut', delay: 0.8 },
+    { property: 'scaleX', from: 1.05, to: 1, duration: 0.2, easing: 'easeIn', delay: 1.05 },
+    { property: 'scaleY', from: 1.05, to: 1, duration: 0.2, easing: 'easeIn', delay: 1.05 },
+    { property: 'opacity', from: 0, to: 1, duration: 0.4, easing: 'easeOut' }
+  ],
+
   // 超级滑入左侧
   superSlideInLeft: [
     { property: 'x', from: -300, to: 0, duration: 0.6, easing: 'easeOut', isOffset: true },
