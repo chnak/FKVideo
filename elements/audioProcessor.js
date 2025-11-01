@@ -187,6 +187,15 @@ export class AudioProcessor {
       console.log("合并音频:", clipAudio.map(({ path }) => basename(path)));
     }
 
+    // 验证所有音频文件都有音频流
+    for (const clip of clipAudio) {
+      const streams = await readFileStreams(clip.path);
+      const hasAudioStream = streams.some(s => s.codec_type === "audio");
+      if (!hasAudioStream) {
+        throw new Error(`音频文件缺少音频流: ${clip.path}`);
+      }
+    }
+
     let inStream = "[0:a]";
     const filterGraph = clipAudio
       .slice(0, -1)
@@ -222,6 +231,15 @@ export class AudioProcessor {
    * 混合任意音频流
    */
   async mixArbitraryAudio({ streams, audioNorm, outputVolume }) {
+    // 验证所有音频流都有音频
+    for (const stream of streams) {
+      const fileStreams = await readFileStreams(stream.path);
+      const hasAudioStream = fileStreams.some(s => s.codec_type === "audio");
+      if (!hasAudioStream) {
+        throw new Error(`音频文件缺少音频流: ${stream.path}`);
+      }
+    }
+
     let maxGain = 30;
     let gaussSize = 5;
     

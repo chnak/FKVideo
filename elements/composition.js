@@ -260,7 +260,13 @@ export class CompositionElement extends BaseElement {
     // 为直接音频元素转换时间（相对时间 -> 绝对时间）
     for (const audioElement of directAudioElements) {
       if (audioElement.startTime !== undefined) {
-        audioElement.startTime = this.startTime + audioElement.startTime;
+        // 检查是否已经是绝对时间（大于等于composition的startTime）
+        if (audioElement.startTime < this.startTime) {
+          // 如果是相对时间，则转换为绝对时间
+          audioElement.startTime = this.startTime + audioElement.startTime;
+          console.log(`[CompositionElement] 直接音频元素 ${audioElement.startTime} 转换为绝对时间 ${audioElement.startTime}`);
+        }
+        // 如果已经是绝对时间，则不需要转换
       }
     }
     audioElements.push(...directAudioElements);
@@ -272,9 +278,16 @@ export class CompositionElement extends BaseElement {
         // console.log(`[CompositionElement] 子元素 ${element.type} 返回 ${elementAudioElements.length} 个音频元素`);
         
         // 为子元素的音频元素转换时间（相对时间 -> 绝对时间）
+        // 注意：如果音频元素已经使用绝对时间，则不需要再次转换
         for (const audioElement of elementAudioElements) {
           if (audioElement.startTime !== undefined) {
-            audioElement.startTime = this.startTime + audioElement.startTime;
+            // 检查是否已经是绝对时间（大于等于composition的startTime）
+            if (audioElement.startTime < this.startTime) {
+              // 如果是相对时间，则转换为绝对时间
+              audioElement.startTime = this.startTime + audioElement.startTime;
+              console.log(`[CompositionElement] 子元素 ${element.type} 音频元素 ${audioElement.startTime} 转换为绝对时间 ${audioElement.startTime}`);
+            }
+            // 如果已经是绝对时间，则不需要转换
           }
         }
         

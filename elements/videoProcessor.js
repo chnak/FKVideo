@@ -241,6 +241,15 @@ async function createAudioStream({
   speedFactor = 1,
   volume = 1
 }) {
+  // 首先检查输入文件是否有音频流
+  const streams = await readFileStreams(source);
+  const hasAudioStream = streams.some(s => s.codec_type === "audio");
+  
+  // 如果没有音频流，返回 null
+  if (!hasAudioStream) {
+    return null;
+  }
+  
   const { writeFileSync } = await import('fs');
   const { join } = await import('path');
   const { nanoid } = await import('nanoid');
