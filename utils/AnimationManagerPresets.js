@@ -140,6 +140,18 @@ export const AnimationManagerPresets = {
 
   // ========== 现代特效动画 ==========
 
+  bigIn:[
+    { property: 'scaleX', from: 2, to: 1, duration: 0.8, easing: 'easeIn' },
+    { property: 'scaleY', from: 2, to: 1, duration: 0.8, easing: 'easeIn' },
+    { property: 'opacity', from: 0, to: 1, duration: 0.8, easing: 'easeIn' }
+  ],
+  bigOut:[
+    { property: 'scaleX', from: 1, to: 2, duration: 0.8, easing: 'easeOut', delay: -0.8 },
+    { property: 'scaleY', from: 1, to: 2, duration: 0.8, easing: 'easeOut', delay: -0.8 },
+    { property: 'opacity', from: 1, to: 0, duration: 0.6, easing: 'easeOut', delay: -0.8 }
+  ],
+
+
   // Material Design 风格
   materialRipple: [
     { property: 'scaleX', from: 0, to: 1, duration: 0.4, easing: 'easeOut' },
@@ -238,10 +250,13 @@ export const AnimationManagerPresets = {
 
   // 爆炸效果
   explodeIn: [
-    { property: 'scaleX', from: 0, to: 1.2, duration: 0.3, easing: 'easeOut' },
-    { property: 'scaleY', from: 0, to: 1.2, duration: 0.3, easing: 'easeOut' },
-    { property: 'scaleX', from: 1.2, to: 1, duration: 0.3, easing: 'easeIn', delay: 0.3 },
-    { property: 'scaleY', from: 1.2, to: 1, duration: 0.3, easing: 'easeIn', delay: 0.3 },
+    { property: 'scaleX', from: 0, to: 1, duration: 0.3, easing: 'easeOut' },
+    { property: 'scaleY', from: 0, to: 1, duration: 0.3, easing: 'easeOut' },
+    { property: 'scaleX', from: 1, to: 1.2, duration: 0.15, easing: 'easeOut', delay: 0.3 },
+    { property: 'scaleY', from: 1, to: 1.2, duration: 0.15, easing: 'easeOut', delay: 0.3 },
+    // 由于乘法组合，要让最终结果是 1，需要：1 * 1.2 * (1/1.2) = 1
+    { property: 'scaleX', from: 1, to: 1/1.2, duration: 0.15, easing: 'easeIn', delay: 0.45 },
+    { property: 'scaleY', from: 1, to: 1/1.2, duration: 0.15, easing: 'easeIn', delay: 0.45 },
     { property: 'rotation', from: 0, to: 360, duration: 0.5, easing: 'easeOut' },
     { property: 'opacity', from: 0, to: 1, duration: 0.3, easing: 'easeOut' }
   ],
