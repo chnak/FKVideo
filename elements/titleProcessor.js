@@ -533,8 +533,8 @@ export async function createTitleElement(config) {
               fontFamily: finalFontFamily,
               fill: textColor,
               textAlign: 'left',
-              originX: 'left',
-              originY: 'top'
+              originX: positionProps.originX,
+              originY: positionProps.originY,
             });
             
             // 计算文字尺寸用于渐变
@@ -616,8 +616,8 @@ export async function createTitleElement(config) {
             // 保存原始位置信息，BaseElement 会处理位置动画
             originalLeft: obj.left,
             originalTop: obj.top,
-            originalOriginX: obj.originX,
-            originalOriginY: obj.originY,
+            originalOriginX: 'center',
+            originalOriginY: 'center',
             // 添加分割段的延迟时间信息
             segmentDelay: segmentDelay
           });
@@ -693,7 +693,7 @@ export async function createTitleElement(config) {
           textWidth: actualWidth,
           textHeight: actualHeight
         }, false); // 标记为普通文本
-        
+
         // 创建文字对象
         if (displayText) {
           const textObj = new fabric.Text(displayText, {
@@ -706,8 +706,8 @@ export async function createTitleElement(config) {
             scaleY: scaleY,
             angle: angle,
             opacity: opacity,
-            originX: 'center',
-            originY: 'center',
+            originX: positionProps.originX || originX || 'center',
+            originY: positionProps.originY || originY || 'center',
             rotationX: rotationX,
             rotationY: rotationY,
             rotationZ: rotationZ,
