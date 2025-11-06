@@ -10,6 +10,7 @@
 
 - 🎬 **JSON 配置** - 使用简洁的 JSON 配置创建复杂视频
 - 🎨 **多种元素类型** - 支持视频、图像、文本、形状、音频等元素
+- 📡 **音频示波器** - 支持波形、频谱、条形图等多种音频可视化效果
 - ✨ **丰富动画系统** - 内置多种缓动函数和动画效果，支持预设动画
 - 🚀 **高性能渲染** - 基于 Canvas 和 FFmpeg 的高效渲染
 - 📱 **灵活布局** - 支持绝对定位和相对定位
@@ -207,6 +208,44 @@ const outputPath = await builder.render();
   fadeOut: 0.5
 }
 ```
+
+### 音频可视化元素 (AudioVisualizerElement)
+
+音频可视化元素可以实时显示音频波形、频谱等效果，支持多种可视化类型：
+
+```javascript
+{
+  type: "audioVisualizer",
+  audioFile: "path/to/audio.mp3",
+  visualizerType: "waveform", // waveform, spectrum, bars, circle
+  x: "50%",
+  y: "50%",
+  width: "1800px",
+  height: "400px",
+  color: "#00ff00",
+  backgroundColor: "rgba(0, 255, 0, 0.05)",
+  lineWidth: 3,
+  sensitivity: 4.0,
+  duration: 10,
+  cutFrom: 0,
+  cutTo: 10
+}
+```
+
+**可视化类型：**
+- `waveform` - 示波器波形显示（经典绿色波形，带网格线）
+- `spectrum` - 频谱分析显示（线性频谱）
+- `bars` - 频谱条形图（垂直条形显示）
+- `circle` - 圆形频谱（径向显示）
+
+**主要参数：**
+- `audioFile` / `source` - 音频文件路径
+- `visualizerType` - 可视化类型
+- `color` - 波形/频谱颜色
+- `backgroundColor` - 背景颜色（可选）
+- `lineWidth` - 线条宽度
+- `sensitivity` - 灵敏度倍数（控制波形/频谱的显示幅度）
+- `cutFrom` / `cutTo` - 音频截取时间范围（秒）
 
 ### 组合元素 (CompositionElement)
 
@@ -411,7 +450,8 @@ track.addBackground({ color: "#ff6b6b" })
      .addText({ text: "Hello" })
      .addSubtitle({ text: "字幕" })
      .addShape({ shape: "circle" })
-     .addAudio({ source: "audio.mp3" });
+     .addAudio({ source: "audio.mp3" })
+     .addAudioVisualizer({ audioFile: "audio.mp3", visualizerType: "waveform" });
 
 // 创建场景
 const scene = track.createScene({ duration: 5 });
@@ -431,6 +471,7 @@ const scene = track.createScene({ duration: 5 });
 // 添加元素
 scene.addBackground({ color: "#ff6b6b" })
      .addText({ text: "场景文本" })
+     .addAudioVisualizer({ audioFile: "audio.mp3", visualizerType: "waveform" })
      .addAnimation('fadeIn', { duration: 2 });
 
 // 设置属性
@@ -510,6 +551,9 @@ npm run demo:background-colors
 - `examples/creatomate-style-example.js` - Creatomate 风格示例
 - `examples/custom-animation-demo.js` - 自定义动画演示
 - `examples/background-colors-demo.js` - 背景颜色演示
+- `examples/music-oscilloscope-video.js` - 音频示波器视频制作示例
+- `examples/test-audio-visualizer.js` - 音频可视化测试示例
+- `examples/test-full-oscilloscope.js` - 完整示波器效果演示
 
 ## 🔧 API 参考
 
@@ -567,6 +611,7 @@ new VideoMaker(config)
 - `addSubtitle(config)` - 添加字幕
 - `addShape(config)` - 添加形状
 - `addAudio(config)` - 添加音频
+- `addAudioVisualizer(config)` - 添加音频可视化（示波器）
 - `addAnimation(animations, overrides)` - 添加动画
 - `createScene(config)` - 创建场景
 
@@ -581,7 +626,180 @@ new VideoMaker(config)
 - `addText(config)` - 添加文本
 - `addSubtitle(config)` - 添加字幕
 - `addShape(config)` - 添加形状
+- `addAudioVisualizer(config)` - 添加音频可视化（示波器）
 - `addAnimation(animations, overrides)` - 添加动画
+
+## 📡 音频示波器功能
+
+FKVideo 支持强大的音频可视化功能，可以创建专业的音频示波器效果视频。
+
+### 快速开始
+
+```javascript
+import { createMultiTrackBuilder } from "./index.js";
+
+const builder = createMultiTrackBuilder({
+  width: 1920,
+  height: 1080,
+  fps: 30,
+  outPath: "output/oscilloscope-video.mp4"
+});
+
+const mainTrack = builder.createTrack({ zIndex: 1 });
+
+const scene = mainTrack.createScene({ duration: 10 })
+  .addBackground({ color: "#000000" })
+  
+  // 主示波器波形
+  .addAudioVisualizer({
+    audioFile: "assets/music.mp3",
+    visualizerType: 'waveform',
+    x: "50%",
+    y: "45%",
+    width: "1800px",
+    height: "400px",
+    color: "#00ff00",  // 经典示波器绿色
+    backgroundColor: "rgba(0, 255, 0, 0.05)",
+    lineWidth: 3,
+    sensitivity: 4.0,
+    duration: 10
+  })
+  
+  // 频谱分析
+  .addAudioVisualizer({
+    audioFile: "assets/music.mp3",
+    visualizerType: 'spectrum',
+    x: "50%",
+    y: "70%",
+    width: "1800px",
+    height: "200px",
+    color: "#00ffff",
+    lineWidth: 2,
+    sensitivity: 6.0,
+    duration: 10
+  })
+  
+  // 频谱条形图
+  .addAudioVisualizer({
+    audioFile: "assets/music.mp3",
+    visualizerType: 'bars',
+    x: "50%",
+    y: "85%",
+    width: "1600px",
+    height: "150px",
+    color: "#ff6b6b",
+    barWidth: 10,
+    barSpacing: 3,
+    maxBars: 60,
+    sensitivity: 8.0,
+    duration: 10
+  })
+  
+  // 添加音频
+  .addAudio({
+    source: "assets/music.mp3",
+    volume: 0.9,
+    duration: 10
+  });
+
+const outputPath = await builder.render();
+```
+
+### 示波器类型
+
+#### 1. 波形示波器 (waveform)
+
+经典示波器效果，显示音频波形，带网格线和中心基准线：
+
+```javascript
+.addAudioVisualizer({
+  audioFile: "audio.mp3",
+  visualizerType: 'waveform',
+  width: "1800px",
+  height: "400px",
+  color: "#00ff00",  // 绿色
+  lineWidth: 3,
+  sensitivity: 4.0
+})
+```
+
+#### 2. 频谱分析 (spectrum)
+
+线性频谱显示，实时分析音频频率：
+
+```javascript
+.addAudioVisualizer({
+  audioFile: "audio.mp3",
+  visualizerType: 'spectrum',
+  width: "1800px",
+  height: "200px",
+  color: "#00ffff",  // 青色
+  lineWidth: 2,
+  sensitivity: 6.0
+})
+```
+
+#### 3. 频谱条形图 (bars)
+
+垂直条形显示，支持自定义条形数量和间距：
+
+```javascript
+.addAudioVisualizer({
+  audioFile: "audio.mp3",
+  visualizerType: 'bars',
+  width: "1600px",
+  height: "150px",
+  color: "#ff6b6b",  // 红色
+  barWidth: 10,
+  barSpacing: 3,
+  maxBars: 60,
+  sensitivity: 8.0
+})
+```
+
+#### 4. 圆形频谱 (circle)
+
+径向圆形频谱显示：
+
+```javascript
+.addAudioVisualizer({
+  audioFile: "audio.mp3",
+  visualizerType: 'circle',
+  width: "300px",
+  height: "300px",
+  color: "#ffd93d",  // 黄色
+  lineWidth: 3,
+  maxBars: 64,
+  sensitivity: 5.0
+})
+```
+
+### 运行示波器示例
+
+```bash
+# 使用 music_11.mp3 制作完整示波器视频
+node examples/music-oscilloscope-video.js
+
+# 测试音频可视化功能
+node examples/test-audio-visualizer.js
+
+# 完整示波器效果演示
+node examples/test-full-oscilloscope.js
+```
+
+### 性能优化
+
+对于长音频文件（>30秒），系统会自动：
+- 降低采样率到 24kHz 以提高性能
+- 使用采样间隔减少内存占用
+- 优化音频数据提取过程
+
+### 注意事项
+
+1. **音频格式支持**：支持 mp3, m4a, wav, flac, aac, ogg 等格式
+2. **处理时间**：长音频文件（>60秒）可能需要较长时间处理
+3. **内存使用**：长音频会自动优化以减少内存占用
+4. **音频截取**：使用 `cutFrom` 和 `cutTo` 参数可以只处理音频的一部分
 
 ## 🛠️ 依赖
 

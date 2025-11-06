@@ -15,6 +15,9 @@ export class AudioVisualizerElement extends BaseElement {
     this.audioFile = config.audioFile || config.source || config.src;
     this.audioPath = null;
     
+    // 记录用户是否显式设置了 duration（用于自动检测功能）
+    this._userSetDuration = config.duration !== undefined;
+    
     // 可视化类型
     this.visualizerType = config.visualizerType || 'waveform'; // waveform, spectrum, bars, circle
     
@@ -51,7 +54,8 @@ export class AudioVisualizerElement extends BaseElement {
     if (this.audioFile) {
       // 检查并准备音频文件
       await this.prepareAudioFile();
-      // 提取音频数据
+      
+      // 提取音频数据（会在 extractAudioData 中自动检测时长）
       await this.extractAudioData();
       this.isInitialized = true;
     }
@@ -94,13 +98,36 @@ export class AudioVisualizerElement extends BaseElement {
 
     // 获取音频信息
     const audioStream = streams.find(s => s.codec_type === "audio");
-    const duration = audioStream.duration || 0;
+    const duration = Number(audioStream?.duration) || 0;
+    
+    // 确保 audioDuration 是数字类型
     this.audioDuration = this.cutTo 
-      ? Math.min(duration, this.cutTo - this.cutFrom)
+      ? Math.min(duration, this.cutTo - (this.cutFrom || 0))
       : duration;
+    
+    // 如果设置了 audioFile 但用户没有显式设置 duration，自动读取音频文件时长
+    if (!this._userSetDuration && this.audioFile && duration > 0) {
+      const fullDuration = duration;
+      if (fullDuration > 0 && !isNaN(fullDuration)) {
+        // 如果设置了 cutTo，使用截取后的时长；否则使用完整时长
+        this.duration = this.cutTo 
+          ? Math.min(fullDuration, this.cutTo - (this.cutFrom || 0))
+          : fullDuration;
+        console.log(`[AudioVisualizer] 自动检测音频时长: ${this.duration.toFixed(2)}秒 (从 ${fullDuration.toFixed(2)}秒 音频文件)`);
+      }
+    }
 
     // 计算每帧采样数
     this.samplesPerFrame = Math.floor(this.sampleRate / (this.fps || 30));
+    
+    // 对于长音频，降低采样率以提高性能
+    // 如果音频时长超过30秒，使用较低的采样率
+    const audioDurationNum = Number(this.audioDuration);
+    if (audioDurationNum > 30 && !isNaN(audioDurationNum)) {
+      const originalSampleRate = this.sampleRate;
+      this.sampleRate = 24000; // 降低到24kHz
+      console.log(`[AudioVisualizer] 音频较长(${audioDurationNum.toFixed(2)}s)，降低采样率以提高性能: ${originalSampleRate}Hz -> ${this.sampleRate}Hz`);
+    }
 
     // 提取 PCM 数据到临时文件
     // 确保 tmpDir 存在
@@ -127,11 +154,31 @@ export class AudioVisualizerElement extends BaseElement {
     const samples = new Int16Array(pcmBuffer.buffer, pcmBuffer.byteOffset, pcmBuffer.length / 2);
     
     // 归一化到 -1 到 1 范围
-    this.audioData = Array.from(samples).map(s => s / 32768.0);
+    // 对于长音频，可以跳过一些采样点以减少内存占用
+    const skipFactor = this.audioDuration > 30 ? 2 : 1; // 如果音频超过30秒，每2个采样点取1个
+    if (skipFactor > 1) {
+      console.log(`[AudioVisualizer] 音频较长，使用采样间隔: ${skipFactor} (每${skipFactor}个采样点取1个)`);
+      const skippedSamples = [];
+      for (let i = 0; i < samples.length; i += skipFactor) {
+        skippedSamples.push(samples[i] / 32768.0);
+      }
+      this.audioData = skippedSamples;
+      // 调整采样率以反映跳过的采样点
+      this.sampleRate = this.sampleRate / skipFactor;
+    } else {
+      this.audioData = Array.from(samples).map(s => s / 32768.0);
+    }
     
     // 调试信息
     if (this.audioData.length > 0) {
-      const maxAmplitude = Math.max(...this.audioData.map(Math.abs));
+      // 使用循环计算最大值，避免堆栈溢出（长音频文件可能有数百万个采样点）
+      let maxAmplitude = 0;
+      for (let i = 0; i < this.audioData.length; i++) {
+        const absValue = Math.abs(this.audioData[i]);
+        if (absValue > maxAmplitude) {
+          maxAmplitude = absValue;
+        }
+      }
       console.log(`[AudioVisualizer] 音频数据提取成功: ${this.audioData.length} 个采样点, 最大振幅: ${maxAmplitude.toFixed(4)}`);
     } else {
       console.warn(`[AudioVisualizer] 警告: 音频数据为空`);
@@ -333,16 +380,7 @@ export class AudioVisualizerElement extends BaseElement {
     if (this.backgroundColor) {
       ctx.fillStyle = this.backgroundColor;
       ctx.fillRect(0, 0, width, height);
-    } else {
-      // 如果没有背景，绘制一个半透明的测试背景，确保能看到区域
-      ctx.fillStyle = 'rgba(255, 0, 0, 0.1)';
-      ctx.fillRect(0, 0, width, height);
     }
-
-    // 绘制一个明显的测试矩形边框
-    ctx.strokeStyle = '#00ff00';
-    ctx.lineWidth = 4;
-    ctx.strokeRect(10, 10, width - 20, height - 20);
 
     // 根据类型渲染不同的可视化（相对于画布中心）
     ctx.strokeStyle = this.color;
@@ -387,7 +425,8 @@ export class AudioVisualizerElement extends BaseElement {
       return;
     }
 
-    const centerY = y;
+    // 使用画布中心作为基准（传入的 y 参数应该是画布中心）
+    const centerY = height / 2;
     const halfHeight = height / 2;
     const samples = Math.min(audioData.length, Math.floor(width));
 
