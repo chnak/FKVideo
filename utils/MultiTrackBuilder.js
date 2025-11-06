@@ -19,6 +19,7 @@ class Track {
     this.scenes = [];   // 轨道包含的场景
     this.builder = builder;
     this.trackIndex = builder.trackIndex;
+    this._lrcQueue = []; // LRC 加载任务队列
     
     // 应用额外配置
     Object.assign(this, trackConfig);
@@ -104,6 +105,39 @@ class Track {
     
     this.elements.push(subtitle);
     return this;
+  }
+
+  /**
+   * 从 LRC 文件添加字幕（支持链式调用）
+   * @param {string} lrcPath - LRC 文件路径
+   * @param {Object} options - 字幕样式选项
+   * @returns {this} 返回当前对象（支持链式调用）
+   * 
+   * @example
+   * // 支持链式调用
+   * const scene = mainTrack.createScene({ duration: 60 })
+   *   .addBackground({ color: "#000000" })
+   *   .addAudio({ source: "audio.mp3" })
+   *   .addLRC("lyrics.lrc", { fontSize: 48 });
+   */
+  addLRC(lrcPath, options = {}) {
+    // 将 LRC 加载任务加入队列，在 build() 时统一处理
+    this._lrcQueue.push({ lrcPath, options });
+    return this;
+  }
+
+  /**
+   * 处理 LRC 队列（内部方法）
+   * @private
+   */
+  async _processLRCQueue() {
+    if (this._lrcQueue.length === 0) return;
+    
+    const { LRCSubtitleBuilder } = await import('./lrcSubtitleBuilder.js');
+    for (const { lrcPath, options } of this._lrcQueue) {
+      await LRCSubtitleBuilder.addSubtitlesFromLRC(this, lrcPath, options);
+    }
+    this._lrcQueue = [];
   }
 
   /**
@@ -379,6 +413,7 @@ class Scene {
     this.animations = []; // 场景级别的动画
     this.builder = builder;
     this.sceneIndex = builder.scenes.length;
+    this._lrcQueue = []; // LRC 加载任务队列
     
     // 应用额外配置
     Object.assign(this, sceneConfig);
@@ -495,6 +530,39 @@ class Scene {
     
     this.elements.push(subtitle);
     return this;
+  }
+
+  /**
+   * 从 LRC 文件添加字幕（支持链式调用）
+   * @param {string} lrcPath - LRC 文件路径
+   * @param {Object} options - 字幕样式选项
+   * @returns {this} 返回当前对象（支持链式调用）
+   * 
+   * @example
+   * // 支持链式调用
+   * const scene = mainTrack.createScene({ duration: 60 })
+   *   .addBackground({ color: "#000000" })
+   *   .addAudio({ source: "audio.mp3" })
+   *   .addLRC("lyrics.lrc", { fontSize: 48 });
+   */
+  addLRC(lrcPath, options = {}) {
+    // 将 LRC 加载任务加入队列，在 build() 时统一处理
+    this._lrcQueue.push({ lrcPath, options });
+    return this;
+  }
+
+  /**
+   * 处理 LRC 队列（内部方法）
+   * @private
+   */
+  async _processLRCQueue() {
+    if (this._lrcQueue.length === 0) return;
+    
+    const { LRCSubtitleBuilder } = await import('./lrcSubtitleBuilder.js');
+    for (const { lrcPath, options } of this._lrcQueue) {
+      await LRCSubtitleBuilder.addSubtitlesFromLRC(this, lrcPath, options);
+    }
+    this._lrcQueue = [];
   }
 
   /**
@@ -1105,7 +1173,35 @@ export class MultiTrackBuilder {
   /**
    * 构建视频配置
    */
-  build() {
+  async build() {
+    // 处理所有 LRC 队列（异步加载字幕）
+    const lrcPromises = [];
+    
+    // 处理场景的 LRC 队列
+    for (const scene of this.scenes) {
+      if (scene._lrcQueue && scene._lrcQueue.length > 0) {
+        lrcPromises.push(scene._processLRCQueue());
+      }
+    }
+    
+    // 处理轨道的 LRC 队列
+    for (const track of this.tracks) {
+      if (track._lrcQueue && track._lrcQueue.length > 0) {
+        lrcPromises.push(track._processLRCQueue());
+      }
+      // 处理轨道中场景的 LRC 队列
+      for (const scene of track.scenes) {
+        if (scene._lrcQueue && scene._lrcQueue.length > 0) {
+          lrcPromises.push(scene._processLRCQueue());
+        }
+      }
+    }
+    
+    // 等待所有 LRC 加载完成
+    if (lrcPromises.length > 0) {
+      await Promise.all(lrcPromises);
+    }
+    
     // 自动计算场景时长
     this.scenes.forEach(scene => {
       const calculatedDuration = this.calculateSceneDuration(scene);
@@ -1215,7 +1311,7 @@ export class MultiTrackBuilder {
    * 创建并渲染视频
    */
   async render() {
-    const config = this.build();
+    const config = await this.build();
     const videoMaker = new VideoMaker(config);
     
     // 监听事件
@@ -1353,6 +1449,36 @@ export class SceneBuilder {
     };
     
     this.scene.elements.push(subtitle);
+    return this;
+  }
+
+  /**
+   * 从 LRC 文件添加字幕（已废弃，请使用 addLRC）
+   * @deprecated 请使用 addLRC 方法
+   * @param {string} lrcPath - LRC 文件路径
+   * @param {Object} options - 字幕样式选项
+   * @returns {Promise<this>} 返回当前对象（支持链式调用）
+   */
+  async addSubtitlesFromLRC(lrcPath, options = {}) {
+    return this.addLRC(lrcPath, options);
+  }
+
+  /**
+   * 从 LRC 文件添加字幕
+   * @param {string} lrcPath - LRC 文件路径
+   * @param {Object} options - 字幕样式选项
+   * @returns {Promise<this>} 返回当前对象（支持链式调用）
+   * 
+   * @example
+   * // 由于是异步方法，需要先完成同步的链式调用，然后单独调用
+   * const scene = mainTrack.createScene({ duration: 60 })
+   *   .addBackground({ color: "#000000" })
+   *   .addAudio({ source: "audio.mp3" });
+   * await scene.addLRC("lyrics.lrc", { fontSize: 48 });
+   */
+  async addLRC(lrcPath, options = {}) {
+    const { LRCSubtitleBuilder } = await import('./lrcSubtitleBuilder.js');
+    await LRCSubtitleBuilder.addSubtitlesFromLRC(this, lrcPath, options);
     return this;
   }
 

@@ -131,6 +131,12 @@ export async function createTextElement(config) {
   const finalFontSizeValue = finalFontSize;
   const maxLength = calculateMixedTextCapacity(canvasWidth*0.85, finalFontSize, text, finalFontFamily);
   const text_list=parseSubtitles(text,duration,maxLength.maxChars);
+  
+  // 如果 config 中有 startTime，说明是 LRC 字幕，使用指定的 startTime
+  // 否则使用累计时长（连续字幕）
+  const hasExplicitStartTime = config.startTime !== undefined && config.startTime !== null;
+  const baseStartTime = hasExplicitStartTime ? config.startTime : 0;
+  
   let totalDuration = 0;
   const textSegments = text_list.map((item, index) => { 
     
@@ -146,9 +152,17 @@ export async function createTextElement(config) {
       fadeIn: fadeIn,
       fadeOut: fadeOut
     };
-    data.startTime = totalDuration;
+    
+    if (hasExplicitStartTime && text_list.length === 1) {
+      // LRC 字幕且只有一个段落，使用指定的 startTime
+      data.startTime = baseStartTime;
+    } else {
+      // 连续字幕，使用累计时长
+      data.startTime = baseStartTime + totalDuration;
+    }
+    
     totalDuration += data.duration;
-    data.endTime = totalDuration;
+    data.endTime = data.startTime + data.duration;
     return data;
   });
 
