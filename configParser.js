@@ -5,6 +5,7 @@ import { SubtitleElement } from "./elements/subtitle.js";
 import { ShapeElement } from "./elements/shape.js";
 import { CompositionElement } from "./elements/composition.js";
 import { AudioElement } from "./elements/audio.js";
+import { AudioVisualizerElement } from "./elements/audioVisualizer.js";
 
 /**
  * 配置解析器 - 将 Creatomate 风格的配置转换为内部格式
@@ -24,7 +25,8 @@ export class ConfigParser {
       subtitle: SubtitleElement,
       shape: ShapeElement,
       composition: CompositionElement,
-      audio: AudioElement
+      audio: AudioElement,
+      audioVisualizer: AudioVisualizerElement
     };
   }
 

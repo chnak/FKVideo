@@ -104,6 +104,7 @@ export { ShapeElement } from "./elements/shape.js";
 export { CompositionElement } from "./elements/composition.js";
 export { SubtitleElement } from "./elements/subtitle.js";
 export { AudioElement } from "./elements/audio.js";
+export { AudioVisualizerElement } from "./elements/audioVisualizer.js";
 
 // 导出工具类
 export { Transition } from "./transitions/transition.js";

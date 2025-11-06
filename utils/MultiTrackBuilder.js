@@ -173,6 +173,36 @@ class Track {
   }
 
   /**
+   * 添加音频可视化
+   */
+  addAudioVisualizer(config = {}) {
+    const visualizer = this.builder.createAudioVisualizer({
+      audioFile: config.audioFile || config.source || config.src,
+      visualizerType: config.visualizerType || 'waveform',
+      x: config.x || '50%',
+      y: config.y || '50%',
+      width: config.width || '100%',
+      height: config.height || '200px',
+      color: config.color || '#ffffff',
+      backgroundColor: config.backgroundColor || null,
+      lineWidth: config.lineWidth || 2,
+      barWidth: config.barWidth || 4,
+      barSpacing: config.barSpacing || 2,
+      maxBars: config.maxBars || 32,
+      sensitivity: config.sensitivity || 1.0,
+      duration: config.duration || this.duration,
+      startTime: config.startTime || 0,
+      zIndex: config.zIndex || 4,
+      cutFrom: config.cutFrom || 0,
+      cutTo: config.cutTo,
+      ...config
+    });
+    
+    this.elements.push(visualizer);
+    return this;
+  }
+
+  /**
    * 添加动画到指定元素
    * @param {number} elementIndex 元素索引
    * @param {string|object|array} animations 动画预设名称、动画配置或动画配置数组
@@ -534,6 +564,36 @@ class Scene {
   }
 
   /**
+   * 添加音频可视化
+   */
+  addAudioVisualizer(config = {}) {
+    const visualizer = this.builder.createAudioVisualizer({
+      audioFile: config.audioFile || config.source || config.src,
+      visualizerType: config.visualizerType || 'waveform',
+      x: config.x || '50%',
+      y: config.y || '50%',
+      width: config.width || '100%',
+      height: config.height || '200px',
+      color: config.color || '#ffffff',
+      backgroundColor: config.backgroundColor || null,
+      lineWidth: config.lineWidth || 2,
+      barWidth: config.barWidth || 4,
+      barSpacing: config.barSpacing || 2,
+      maxBars: config.maxBars || 32,
+      sensitivity: config.sensitivity || 1.0,
+      duration: config.duration || this.duration,
+      startTime: config.startTime || 0,
+      zIndex: config.zIndex || 4,
+      cutFrom: config.cutFrom || 0,
+      cutTo: config.cutTo,
+      ...config
+    });
+    
+    this.elements.push(visualizer);
+    return this;
+  }
+
+  /**
    * 添加动画到指定元素
    * @param {number} elementIndex 元素索引
    * @param {string|object|array} animations 动画预设名称、动画配置或动画配置数组
@@ -889,6 +949,34 @@ export class MultiTrackBuilder {
       loop: config.loop || false,
       fadeIn: config.fadeIn || 0,
       fadeOut: config.fadeOut || 0,
+      ...config
+    };
+  }
+
+  /**
+   * 创建音频可视化元素
+   */
+  createAudioVisualizer(config = {}) {
+    return {
+      type: "audioVisualizer",
+      audioFile: config.audioFile || config.source || config.src,
+      visualizerType: config.visualizerType || 'waveform',
+      x: config.x || '50%',
+      y: config.y || '50%',
+      width: config.width || '100%',
+      height: config.height || '200px',
+      color: config.color || '#ffffff',
+      backgroundColor: config.backgroundColor || null,
+      lineWidth: config.lineWidth || 2,
+      barWidth: config.barWidth || 4,
+      barSpacing: config.barSpacing || 2,
+      maxBars: config.maxBars || 32,
+      sensitivity: config.sensitivity || 1.0,
+      duration: config.duration || 5,
+      startTime: config.startTime || 0,
+      zIndex: config.zIndex || 4,
+      cutFrom: config.cutFrom || 0,
+      cutTo: config.cutTo,
       ...config
     };
   }
