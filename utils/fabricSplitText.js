@@ -57,6 +57,41 @@ function syncDurationWithMinDuration(textSegments, totalDuration, minDuration = 
 
   return segments;
 }
+
+//计算文本容量
+export const calculateMixedTextCapacity=function calculateMixedTextCapacity(screenWidth, fontSize, text, fontFamily = 'Microsoft YaHei') {
+  // 统计中英文比例
+  const chineseChars = text.match(/[\u4e00-\u9fa5]/g) || [];
+  const englishChars = text.match(/[a-zA-Z]/g) || [];
+  const otherChars = text.match(/[^\u4e00-\u9fa5a-zA-Z\s]/g) || [];
+  
+  const totalChars = chineseChars.length + englishChars.length + otherChars.length;
+  const chineseRatio = chineseChars.length / totalChars;
+  const englishRatio = englishChars.length / totalChars;
+  
+  // 不同字符的宽度系数
+  const chineseWidth = fontSize * 1.0;    // 中文字符宽度
+  const englishWidth = fontSize * 0.6;    // 英文字符宽度
+  const otherWidth = fontSize * 0.7;      // 其他字符宽度
+  
+  // 计算平均字符宽度
+  const avgCharWidth = (chineseWidth * chineseRatio) + 
+                      (englishWidth * englishRatio) + 
+                      (otherWidth * (1 - chineseRatio - englishRatio));
+  
+  const maxChars = Math.floor(screenWidth / avgCharWidth);
+  
+  return {
+    maxChars,
+    avgCharWidth,
+    chineseCount: chineseChars.length,
+    englishCount: englishChars.length,
+    otherCount: otherChars.length,
+    chineseRatio,
+    englishRatio
+  };
+}
+
 export const parseSubtitles=function parseSubtitles(text,duration,maxLength) {
   const text_list_with_duration=calculateSpeechTimeMixed(text);
   const text_list=splitText(text,maxLength);

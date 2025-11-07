@@ -66,14 +66,25 @@ export class AudioElement extends BaseElement {
 
       // 计算实际播放时长
       // 优先级：duration > cutTo > 原始时长
-      if (this.duration) {
+      // 如果设置了 cutTo，优先使用 cutTo 计算时长（即使也设置了 duration）
+      if (this.cutTo !== undefined && this.cutTo !== null) {
+        // 使用 cutTo 计算时长
+        this.audioDuration = Math.max(0, this.cutTo - this.cutFrom);
+        // 如果同时设置了 duration，取较小值
+        if (this.duration) {
+          this.audioDuration = Math.min(this.audioDuration, this.duration);
+        }
+        //console.log(`[AudioElement] 使用cutTo截取: ${this.audioDuration}s (cutFrom=${this.cutFrom}, cutTo=${this.cutTo})`);
+      } else if (this.duration) {
         this.audioDuration = this.duration;
         //console.log(`[AudioElement] 使用元素duration: ${this.audioDuration}s`);
-      } else if (this.cutTo) {
-        this.audioDuration = Math.min(originalDuration, this.cutTo - this.cutFrom);
-        //console.log(`[AudioElement] 使用cutTo截取: ${this.audioDuration}s`);
       } else {
-        this.audioDuration = originalDuration;
+        // 如果只设置了 cutFrom，从 cutFrom 开始到文件结束
+        if (this.cutFrom > 0) {
+          this.audioDuration = Math.max(0, originalDuration - this.cutFrom);
+        } else {
+          this.audioDuration = originalDuration;
+        }
         //console.log(`[AudioElement] 使用原始时长: ${this.audioDuration}s`);
       }
 

@@ -5,7 +5,7 @@ import { createSplitText } from "../utils/fabricSplitText.js";
 import { animationManager } from "../animations/AnimationManager.js";
 import { createFabricCanvas, renderFabricCanvas } from "../utils/fabricUtils.js";
 import { BaseElement } from "./base.js";
-
+import { AudioElement } from "./audio.js";
 
 /**
  * 打字机效果 - 逐字显示文字
@@ -311,6 +311,11 @@ export async function createTitleElement(config) {
     duration = 4, // 元素持续时间
     width, 
     height,
+
+    audio = null, // 音频文件路径
+    volume = 1.0, // 音量
+    fadeIn = 0, // 淡入时间
+    fadeOut = 0, // 淡出时间
     // 阴影配置
     shadow = null,
     shadowColor = "#000000",
@@ -405,11 +410,37 @@ export async function createTitleElement(config) {
     }
 
   }
+
+  const audioElements=[]
+  if (audio) {
+    // console.log(`[Subtitle] 创建全局音频元素: ${audio}`);
+    const audioElement = new AudioElement({
+      type: 'audio',
+      source: audio,
+      volume: volume,
+      fadeIn: fadeIn,
+      fadeOut: fadeOut,
+      startTime: config.startTime || 0, // 使用字幕元素的 startTime
+      duration: duration
+    });
+    await audioElement.initialize();
+    audioElements.push(audioElement);
+    // console.log(`[Subtitle] 全局音频元素初始化完成`);
+  }
   
   
+  
+  // 保存 startTime 和 duration 到返回对象中，供 readNextFrame 使用
+  const elementStartTime = config.startTime || 0;
   
   return {
     text: text, // 保存 text 变量到返回对象中
+    startTime: elementStartTime, // 保存 startTime
+    duration: duration, // 保存 duration
+    // 获取音频元素列表（用于渲染器）
+    getAudioElements() {
+      return audioElements;
+    },
     async readNextFrame(progress, canvas, time = null) {
       if (!this.text) {
         return null;
@@ -478,12 +509,14 @@ export async function createTitleElement(config) {
           // 计算分割动画进度
           // segment.startTime 和 segment.endTime 是相对于分割动画的延迟时间（秒）
           // 需要将分割时间转换为绝对时间
-          const elementStartTime = config.startTime || 0;
+          // 使用保存的 elementStartTime（从返回对象的 startTime 属性获取）
           const segmentStartTime = elementStartTime + segment.startTime;
           const segmentEndTime = elementStartTime + segment.endTime;
           
           // 使用绝对时间来计算分割动画进度
-          const absoluteTime = time || (elementStartTime + progress * duration);
+          // 如果 time 参数提供了，使用它（应该是相对于元素开始的时间）
+          // 否则使用 progress * duration 计算
+          const absoluteTime = (time !== null && time !== undefined) ? (elementStartTime + time) : (elementStartTime + progress * duration);
           
           // 计算分割进度：当时间在段开始时间之前时，进度为0；在段结束时间之后时，进度为1
           let segmentProgress = 0;

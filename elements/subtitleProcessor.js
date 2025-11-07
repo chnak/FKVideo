@@ -3,6 +3,7 @@ import { BaseElement } from "./base.js";
 import { parseSubtitles } from "../utils/fabricSplitText.js";
 import { getPositionProps } from "../utils/positionUtils.js";
 import { AudioElement } from "./audio.js";
+import { createTitleElement } from "./titleProcessor.js";
 
 function createCenteredTextWithBackground(textContent, options = {}) {
   const {

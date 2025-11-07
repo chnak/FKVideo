@@ -158,9 +158,6 @@ export {
   isMultiPropertyAnimation as isAnimationManagerMultiProperty
 } from "./utils/AnimationManagerPresets.js";
 
-// 导出 LRC 字幕功能
-export { LRCParser } from "./utils/lrcParser.js";
-export { LRCSubtitleBuilder, LRCSubtitleBuilder as LRCBuilder } from "./utils/lrcSubtitleBuilder.js";
 
 // 导出 Schema 验证系统
 export {

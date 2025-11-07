@@ -51,6 +51,7 @@
     "gl-texture2d": "^2.1.0",
     "gl-transition": "^1.13.0",
     "gl-transitions": "^1.43.0",
+    "lrc-kit": "^1.1.1",
     "nanoid": "^5.0.4",
     "zod": "^4.1.12"
   },

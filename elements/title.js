@@ -134,6 +134,12 @@ export class TitleElement extends BaseElement {
   }
 
   async readNextFrame(time, canvas) {
+    // 如果时间在 delay 之前，不显示元素
+    const elementStartTime = this.startTime + this.delay;
+    if (time < elementStartTime) {
+      return null;
+    }
+    
     if (!this.titleElement) {
       await this.initialize();
     }

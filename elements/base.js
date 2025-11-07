@@ -18,8 +18,9 @@ export class BaseElement {
     this.source = config.source||config.src;
     this.type = config.type;
     this.startTime = config.startTime || 0;
+    this.delay = config.delay || 0; // 延迟时间，在 startTime 之后延迟 delay 秒再开始显示
     this.duration = config.duration || 4;
-    this.endTime = config.endTime || this.startTime + this.duration;
+    this.endTime = config.endTime || this.startTime + this.delay + this.duration;
     this.canvasWidth = config.canvasWidth || 1920;
     this.canvasHeight = config.canvasHeight || 1080;
     this.fps = config.fps || 30;
@@ -193,6 +194,34 @@ export class BaseElement {
    * 计算当前时间的变换属性
    */
   getTransformAtTime(time) {
+    // 如果时间在 delay 之前，返回初始状态（不显示）
+    const elementStartTime = this.startTime + this.delay;
+    if (time < elementStartTime) {
+      // 解析 x 和 y 位置，支持百分比和数值
+      let x = this.x;
+      let y = this.y;
+      
+      if (typeof this.x === 'string') {
+        x = parsePositionValue(this.x, this.canvasWidth, 'px');
+      }
+      if (typeof this.y === 'string') {
+        y = parsePositionValue(this.y, this.canvasHeight, 'px');
+      }
+      
+      return {
+        x,
+        y,
+        scaleX: this.scaleX,
+        scaleY: this.scaleY,
+        rotation: this.rotation,
+        opacity: 0, // 在 delay 期间不显示
+        rotationX: this.rotationX,
+        rotationY: this.rotationY,
+        rotationZ: this.rotationZ,
+        translateZ: this.translateZ
+      };
+    }
+    
     const progress = this.getProgressAtTime(time);
     
     // 解析 x 和 y 位置，支持百分比和数值
@@ -368,7 +397,9 @@ export class BaseElement {
    * 获取元素在当前时间的进度 (0-1)
    */
   getProgressAtTime(time) {
-    const elementTime = time - this.startTime;
+    // 考虑 delay：元素在 startTime + delay 时才开始显示
+    const elementStartTime = this.startTime + this.delay;
+    const elementTime = time - elementStartTime;
     return Math.max(0, Math.min(elementTime / this.duration, 1));
   }
 
@@ -679,13 +710,21 @@ export class BaseElement {
       }
       
       // 应用变换到 Fabric 对象
+      // 对于 split 文本，需要将 segmentProgress（fabricObject.opacity）与动画效果（objectTransform.opacity）相乘
+      let finalOpacity = objectTransform.opacity;
+      if (isSplitText && fabricObject.opacity !== undefined) {
+        // 将 segmentProgress（fabricObject.opacity）与动画效果（objectTransform.opacity）相乘
+        // 这样既保留了分割进度，又应用了动画效果
+        finalOpacity = fabricObject.opacity * objectTransform.opacity;
+      }
+      
       fabricObject.set({
         left: objectLeft,
         top: objectTop,
         scaleX: objectTransform.scaleX,
         scaleY: objectTransform.scaleY,
         angle: objectTransform.rotation,
-        opacity: objectTransform.opacity,
+        opacity: finalOpacity,
         rotationX: objectTransform.rotationX,
         rotationY: objectTransform.rotationY,
         translateZ: objectTransform.translateZ,
