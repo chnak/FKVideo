@@ -47,11 +47,9 @@ export class SubtitleElement extends BaseElement {
     
     if (!this.titleElements) {
       // 解析 fontSize（支持 rpx, px, vw, vh, % 等单位）
-      const parsedFontSize = typeof this.fontSize === 'string' 
-        ? BaseElement.parseFontSize(this.fontSize, this.canvasWidth, this.canvasHeight)
-        : (this.fontSize || 72);
+      const fontResult = await BaseElement.processFont({ fontPath:this.fontPath, fontFamily:this.fontFamily, fontSize:this.fontSize }, this.canvasWidth, this.canvasHeight);
       
-      const maxLength = calculateMixedTextCapacity(this.canvasWidth*0.85, parsedFontSize, this.text, this.fontFamily);
+      const maxLength = calculateMixedTextCapacity(this.canvasWidth*0.85, fontResult.fontSize, this.text, fontResult.fontFamily);
       const text_list=parseSubtitles(this.text,this.duration,maxLength.maxChars);
       
       this.titleElements=[]
@@ -63,7 +61,7 @@ export class SubtitleElement extends BaseElement {
           text: item.text, // 使用 item.text 而不是 this.text
           fontPath: this.fontPath,
           fontFamily: this.fontFamily,
-          fontSize: parsedFontSize, // 传递解析后的 fontSize 参数
+          fontSize: this.fontSize, // 传递解析后的 fontSize 参数
           textColor: this.textColor,
           position: this.position,
           x: this.x,
