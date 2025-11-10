@@ -509,9 +509,9 @@ export async function createTitleElement(config) {
         } else if (textAlign === 'right') {
           currentX += positionProps.left;
         }
-        if(text.includes('开始渲染')||text.includes('字幕')){
-          console.log(text,currentX,'==',charSpacing*textSegments.length)
-        }
+        // if(text.includes('开始渲染')||text.includes('字幕')){
+        //   console.log(text,currentX,'==',charSpacing*textSegments.length)
+        // }
 
         for (let i = 0; i < textSegments.length; i++) {
           const segment = textSegments[i];
