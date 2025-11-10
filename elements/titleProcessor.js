@@ -502,9 +502,8 @@ export async function createTitleElement(config) {
         // 根据 textAlign 调整起始位置
         let currentX = positionProps.left;
         let currentY = positionProps.top;
-
         if (textAlign === 'center') {
-          currentX += (totalWidth - positionProps.left) / 2;
+          currentX += ((totalWidth - positionProps.left) / 2) + charSpacing;
         } else if (textAlign === 'right') {
           currentX += positionProps.left;
         }
