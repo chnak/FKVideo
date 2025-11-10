@@ -502,16 +502,20 @@ export async function createTitleElement(config) {
         // 根据 textAlign 调整起始位置
         let currentX = positionProps.left;
         let currentY = positionProps.top;
+        //console.log('width',width,'positionProps.left',positionProps.left,'totalWidth',totalWidth,'charSpacing',charSpacing)
+        const mainCanvas = createFabricCanvas({ width, height });
         if (textAlign === 'center') {
-          currentX += ((totalWidth - positionProps.left) / 2) + charSpacing;
+          currentX +=charSpacing*textSegments.length;
         } else if (textAlign === 'right') {
           currentX += positionProps.left;
         }
+        if(text.includes('开始渲染')||text.includes('字幕')){
+          console.log(text,currentX,'==',charSpacing*textSegments.length)
+        }
 
-        const mainCanvas = createFabricCanvas({ width, height });
-        
         for (let i = 0; i < textSegments.length; i++) {
           const segment = textSegments[i];
+          
           // 计算分割动画进度
           // segment.startTime 和 segment.endTime 是相对于分割动画的延迟时间（秒）
           // 需要将分割时间转换为绝对时间
