@@ -48,7 +48,7 @@ export class LRCSubtitleBuilder {
       x = '50%',
       y = '80%',
       textAlign = 'center',
-      minDuration = 0.5, // 最小显示时长
+      minDuration = 1, // 最小显示时长
       maxDuration = 5.0  // 最大显示时长
     } = options;
 
@@ -71,7 +71,7 @@ export class LRCSubtitleBuilder {
         );
       } else {
         // 最后一句，使用最小时长或默认时长
-        duration = Math.max(minDuration, 1);
+        duration = Math.max(minDuration, 3);
       }
       
       elements.push({
