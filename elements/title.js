@@ -13,6 +13,7 @@ export class TitleElement extends BaseElement {
     this.fontSize = config.fontSize || 72; // 添加 fontSize 参数，默认 72px
     this.textColor = config.textColor || config.color || '#ffffff';
     this.position = config.position || 'center';
+    this.textAlign = config.textAlign || 'left'; // 文本对齐方式
     // this.zoomDirection = config.zoomDirection; // 不设置默认值，只有传入时才启用
     // this.zoomAmount = config.zoomAmount || 0.2;
     this.split = config.split || null;
@@ -83,6 +84,7 @@ export class TitleElement extends BaseElement {
         y: this.y,
         originX: this.originX,
         originY: this.originY,
+        textAlign: this.textAlign, // 传递 textAlign 参数
         zoomDirection: this.zoomDirection,
         zoomAmount: this.zoomAmount,
         animations: this.animations, // 传递 animations 参数

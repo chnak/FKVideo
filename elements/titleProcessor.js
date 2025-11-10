@@ -302,6 +302,7 @@ export async function createTitleElement(config) {
     y, // 自定义 Y 坐标
     originX = "center", // 原点 X
     originY = "center", // 原点 Y
+    textAlign = "left", // 文本对齐方式：left, center, right
     // zoomDirection, // 不设置默认值，只有传入时才启用
     // zoomAmount = 0.2, 
     animations = [], // 动画配置
@@ -498,8 +499,16 @@ export async function createTitleElement(config) {
         }, true); // 标记为分割文本
         
         // 计算文本的起始位置（左上角）
+        // 根据 textAlign 调整起始位置
         let currentX = positionProps.left;
         let currentY = positionProps.top;
+        
+        // 如果 textAlign 是 center 或 right，需要调整起始位置
+        if (textAlign === 'center') {
+          currentX -= totalWidth / 2;
+        } else if (textAlign === 'right') {
+          currentX -= totalWidth;
+        }
         
         // 创建主Fabric Canvas用于合成所有分割文本片段
         const mainCanvas = createFabricCanvas({ width, height });
@@ -739,6 +748,7 @@ export async function createTitleElement(config) {
             scaleY: scaleY,
             angle: angle,
             opacity: opacity,
+            textAlign: textAlign, // 应用 textAlign
             originX: positionProps.originX || originX || 'center',
             originY: positionProps.originY || originY || 'center',
             rotationX: rotationX,
