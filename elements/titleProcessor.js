@@ -502,15 +502,13 @@ export async function createTitleElement(config) {
         // 根据 textAlign 调整起始位置
         let currentX = positionProps.left;
         let currentY = positionProps.top;
-        
-        // 如果 textAlign 是 center 或 right，需要调整起始位置
+
         if (textAlign === 'center') {
-          currentX -= totalWidth / 2;
+          currentX += (totalWidth - positionProps.left) / 2;
         } else if (textAlign === 'right') {
-          currentX -= totalWidth;
+          currentX += positionProps.left;
         }
-        
-        // 创建主Fabric Canvas用于合成所有分割文本片段
+
         const mainCanvas = createFabricCanvas({ width, height });
         
         for (let i = 0; i < textSegments.length; i++) {
@@ -574,7 +572,7 @@ export async function createTitleElement(config) {
               fontSize: finalFontSize,
               fontFamily: finalFontFamily,
               fill: textColor,
-              textAlign: 'left',
+              textAlign: textAlign,
               originX: positionProps.originX,
               originY: positionProps.originY,
             });
@@ -601,6 +599,7 @@ export async function createTitleElement(config) {
               scaleY: scaleY,
               angle: angle,
               opacity: opacity,
+              textAlign: textAlign,
               originX: positionProps.originX,
               originY: positionProps.originY,
               // 3D 变换属性（Fabric.js 可能不完全支持，但保留以备将来扩展）
