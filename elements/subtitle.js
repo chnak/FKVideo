@@ -70,6 +70,7 @@ export class SubtitleElement extends BaseElement {
           originY: this.originY,
           zoomDirection: this.zoomDirection,
           zoomAmount: this.zoomAmount,
+          textAlign: 'center',
           animations: this.animations, // 传递 animations 参数
           split: this.split,
           splitDelay: this.splitDelay,
