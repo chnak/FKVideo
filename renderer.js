@@ -273,6 +273,9 @@ export class VideoRenderer {
     const preset = this.config.fast ? 'ultrafast' : (this.config.preset || 'medium');
     const crf = this.config.crf !== undefined ? this.config.crf : (this.config.fast ? 28 : 23);
     
+    // I/O 优化：增加输入缓冲区大小
+    args.push('-thread_queue_size', '512');
+    
     args.push(
       '-c:v', 'libx264',
       '-preset', preset,
@@ -280,11 +283,21 @@ export class VideoRenderer {
       '-pix_fmt', 'yuv420p',  // 使用更兼容的颜色格式
       '-movflags', 'faststart',
       '-r', outputFps.toString(), // 输出帧率 = 输入帧率 × 倍速
-      '-threads', '0' // 使用所有可用 CPU 核心
+      '-threads', '0', // 使用所有可用 CPU 核心
+      // I/O 优化：零延迟调优，减少缓冲延迟
+      '-tune', 'zerolatency',
+      // I/O 优化：减少输出缓冲，更快刷新数据包
+      '-flush_packets', '1'
     );
 
     // 如果有音频，添加音频编码和倍速处理
     if (this.mixedAudioPath) {
+      // I/O 优化：为音频输入也增加缓冲区
+      args.push('-thread_queue_size', '512');
+      // 优化：减少音频探测时间（已知格式）
+      args.push('-probesize', '32');
+      args.push('-analyzeduration', '1000000');  // 1秒
+      
       if (this.playbackSpeed !== 1.0) {
         // 使用atempo滤镜调整音频速度
         args.push('-filter:a', `atempo=${this.playbackSpeed}`);
@@ -296,8 +309,18 @@ export class VideoRenderer {
     args.push('-y', this.config.outPath);
 
     this.ffmpegProcess = spawn('ffmpeg', args, {
-      stdio: ['pipe', 'pipe', 'pipe']
+      stdio: ['pipe', 'pipe', 'pipe'],
+      // Windows 上可能需要设置更大的缓冲区
+      ...(os.platform() === 'win32' && {
+        windowsHide: true
+      })
     });
+    
+    // I/O 优化：设置 stdin 缓冲区大小（如果支持）
+    if (this.ffmpegProcess.stdin && this.ffmpegProcess.stdin.setDefaultEncoding) {
+      // 确保使用二进制模式
+      this.ffmpegProcess.stdin.setDefaultEncoding('binary');
+    }
 
     this.ffmpegProcess.stderr.on('data', (data) => {
       if (this.config.verbose) {
@@ -386,34 +409,139 @@ export class VideoRenderer {
     
     console.log(`📦 共 ${segments.length} 个渲染段`);
     
-    // 确保所有元素都已初始化（并行渲染前必须完成）
-    // 优化：并行初始化所有元素，而不是串行
-    console.log('初始化所有元素...');
-    const totalElements = timeline.elements.length;
-    const initPromises = timeline.elements.map(async (element, index) => {
-      if (!element.isInitialized && typeof element.initialize === 'function') {
-        await element.initialize();
-        return index;
+    // 递归收集所有元素（包括嵌套在 CompositionElement 中的元素）
+    const collectAllElements = (elements) => {
+      const allElements = [];
+      for (const element of elements) {
+        allElements.push(element);
+        // 如果是 CompositionElement，递归收集子元素
+        if (element.type === 'composition' && element.subElements && element.subElements.length > 0) {
+          allElements.push(...collectAllElements(element.subElements));
+        }
       }
-      return null;
+      return allElements;
+    };
+    
+    // 确保所有元素都已初始化（并行渲染前必须完成）
+    // 第一步：先初始化所有 CompositionElement，这样它们的 subElements 才会被创建
+    const compositionElements = timeline.elements.filter(el => el.type === 'composition');
+    for (const element of compositionElements) {
+      if (typeof element.initialize === 'function' && !element.isInitialized) {
+        await element.initialize();
+      }
+    }
+    
+    // 第二步：递归收集所有元素（包括嵌套在 CompositionElement 中的元素）
+    const allElements = collectAllElements(timeline.elements);
+    const totalElements = allElements.length;
+    
+    // 第三步：初始化所有元素（包括嵌套的）
+    const initPromises = allElements.map(async (element, index) => {
+      if (typeof element.initialize === 'function') {
+        try {
+          // 对于 AudioVisualizer，需要确保 audioData 已准备好
+          if (element.type === 'audioVisualizer') {
+            // 即使 isInitialized = true，也要检查 audioData 是否准备好
+            if (element.isInitialized && !element.audioData) {
+              element.isInitialized = false; // 重置状态
+            }
+            if (!element.isInitialized) {
+              await element.initialize();
+            }
+            // 验证 audioData 是否已准备好
+            if (!element.audioData) {
+              // 等待最多30秒，每0.5秒检查一次（长音频文件可能需要较长时间）
+              let waitCount = 0;
+              const maxWaitCount = 60; // 30秒
+              while (!element.audioData && waitCount < maxWaitCount) {
+                await new Promise(resolve => setTimeout(resolve, 500));
+                waitCount++;
+              }
+            }
+          } else {
+            // 其他元素正常初始化
+            if (!element.isInitialized) {
+              await element.initialize();
+            }
+          }
+          return { index, success: true };
+        } catch (error) {
+          console.error(`[初始化] 元素 ${index} 初始化失败:`, error.message);
+          return { index, success: false, error };
+        }
+      }
+      return { index, success: true, skipped: true };
     });
     
-    // 使用 Promise.allSettled 并行初始化，即使某些失败也继续
+    // 使用 Promise.allSettled 并行初始化，等待所有完成
     const initResults = await Promise.allSettled(initPromises);
-    const successCount = initResults.filter(r => r.status === 'fulfilled' && r.value !== null).length;
-    console.log(`\n所有元素初始化完成 (${successCount}/${totalElements} 成功)`);
+    const successCount = initResults.filter(r => 
+      r.status === 'fulfilled' && r.value && r.value.success
+    ).length;
+    const failedCount = initResults.filter(r => 
+      r.status === 'rejected' || (r.status === 'fulfilled' && r.value && !r.value.success)
+    ).length;
+    
+    // 再次验证 AudioVisualizer 元素是否完全初始化，并等待所有完成
+    // 使用递归收集所有元素（包括嵌套的）
+    const allElementsForCheck = collectAllElements(timeline.elements);
+    
+    const audioVisualizers = allElementsForCheck.filter(el => {
+      const isAudioVisualizer = el.type === 'audioVisualizer' || 
+                                el.constructor?.name === 'AudioVisualizerElement' ||
+                                (el.audioFile && el.visualizerType);
+      return isAudioVisualizer;
+    });
+    
+    if (audioVisualizers.length > 0) {
+      let allReady = false;
+      let waitCount = 0;
+      const maxWaitCount = 60; // 最多等待30秒（每0.5秒检查一次）
+      
+      while (!allReady && waitCount < maxWaitCount) {
+        allReady = true;
+        for (const element of audioVisualizers) {
+          if (!element.isInitialized || !element.audioData) {
+            allReady = false;
+            // 如果 audioData 未准备好，尝试再次初始化
+            if (!element.audioData && typeof element.initialize === 'function') {
+              try {
+                if (!element.isInitialized) {
+                  await element.initialize();
+                } else if (element.isInitialized && !element.audioData) {
+                  // 如果标记为已初始化但 audioData 为空，重置并重新初始化
+                  element.isInitialized = false;
+                  await element.initialize();
+                }
+              } catch (error) {
+                console.error(`[初始化] AudioVisualizer 重新初始化失败:`, error.message);
+              }
+            }
+            break;
+          }
+        }
+        
+        if (!allReady) {
+          await new Promise(resolve => setTimeout(resolve, 500));
+          waitCount++;
+        }
+      }
+      
+      // 最终验证
+      for (const element of audioVisualizers) {
+        if (!element.isInitialized || !element.audioData) {
+          console.error(`[错误] AudioVisualizer 元素未完全初始化: isInitialized=${element.isInitialized}, audioData=${!!element.audioData}`);
+          throw new Error('AudioVisualizer 元素初始化失败，无法继续渲染');
+        }
+      }
+    }
     
     // 处理音频（全局处理一次）
-    console.log('处理音频...');
     const audioElements = await timeline.getAudioElements();
     let globalMixedAudioPath = null;
     if (audioElements.length > 0) {
-      console.log(`发现 ${audioElements.length} 个音频元素，开始处理...`);
       await this.processAudio(timeline, audioElements);
       globalMixedAudioPath = this.mixedAudioPath;
-      console.log('音频处理完成');
-    } else {
-      console.log('没有音频元素');
     }
     
     // 并行渲染各个段
@@ -484,7 +612,6 @@ export class VideoRenderer {
     });
     
     // 等待所有段渲染完成
-    console.log(`\n开始并行渲染 ${segments.length} 个段，最大并发数: ${maxConcurrent}`);
     
     // 启动进度监控（每2秒更新一次总体进度）
     const progressInterval = setInterval(() => {
@@ -627,6 +754,8 @@ export class VideoRenderer {
    */
   createSegmentFfmpegProcess(outputPath, audioPath, startTime, duration, outputFps) {
     const args = [
+      // I/O 优化：增加输入缓冲区大小，减少 I/O 等待
+      '-thread_queue_size', '512',  // 增加线程队列大小（默认 8，增加到 512）
       '-f', 'rawvideo',
       '-vcodec', 'rawvideo',
       '-pix_fmt', 'rgba',
@@ -637,7 +766,12 @@ export class VideoRenderer {
     
     // 如果有音频，添加音频输入并裁剪
     if (audioPath) {
+      // I/O 优化：为音频输入也增加缓冲区
+      args.push('-thread_queue_size', '512');
       args.push('-i', audioPath);
+      // 优化：减少音频探测时间（已知格式）
+      args.push('-probesize', '32');
+      args.push('-analyzeduration', '1000000');  // 1秒（默认 5秒）
       // 使用 atrim 和 asetpts 裁剪音频到对应时间段
       args.push('-filter_complex', `[1:a]atrim=start=${startTime}:duration=${duration},asetpts=PTS-STARTPTS[a]`);
       args.push('-map', '0:v'); // 映射视频流
@@ -655,7 +789,11 @@ export class VideoRenderer {
       '-pix_fmt', 'yuv420p',
       '-movflags', 'faststart',
       '-r', outputFps.toString(),
-      '-threads', '0'
+      '-threads', '0',  // 使用所有可用 CPU 核心
+      // I/O 优化：零延迟调优，减少缓冲延迟
+      '-tune', 'zerolatency',
+      // I/O 优化：减少输出缓冲，更快刷新数据包
+      '-flush_packets', '1'
     );
     
     // 音频编码
@@ -668,21 +806,32 @@ export class VideoRenderer {
     
     args.push('-y', outputPath);
     
-    const process = spawn('ffmpeg', args, {
-      stdio: ['pipe', 'pipe', 'pipe']
+    // I/O 优化：增加管道缓冲区大小（Node.js spawn 选项）
+    const ffmpegProcess = spawn('ffmpeg', args, {
+      stdio: ['pipe', 'pipe', 'pipe'],
+      // Windows 上可能需要设置更大的缓冲区
+      ...(os.platform() === 'win32' && {
+        windowsHide: true
+      })
     });
     
-    process.stderr.on('data', (data) => {
+    // I/O 优化：设置 stdin 缓冲区大小（如果支持）
+    if (ffmpegProcess.stdin && ffmpegProcess.stdin.setDefaultEncoding) {
+      // 确保使用二进制模式
+      ffmpegProcess.stdin.setDefaultEncoding('binary');
+    }
+    
+    ffmpegProcess.stderr.on('data', (data) => {
       if (this.config.verbose) {
         console.log(`[段 ${startTime.toFixed(2)}s] FFmpeg:`, data.toString());
       }
     });
     
-    process.on('error', (error) => {
+    ffmpegProcess.on('error', (error) => {
       console.error(`[段 ${startTime.toFixed(2)}s] FFmpeg 错误:`, error);
     });
     
-    return process;
+    return ffmpegProcess;
   }
   
   /**

@@ -53,6 +53,22 @@ export class AudioVisualizerElement extends BaseElement {
   }
 
   async initialize() {
+    // 注意：BaseElement.initialize() 会在开始时设置 isInitialized = true
+    // 但我们需要在 audioData 提取完成后才真正完成初始化
+    // 所以先检查是否已经初始化完成
+    if (this.isInitialized && this.audioData) {
+      // 已经初始化完成，直接返回
+      return;
+    }
+    
+    // 如果 BaseElement 已经设置了 isInitialized，先重置
+    // 因为我们需要等待 audioData 准备好
+    const wasInitialized = this.isInitialized;
+    if (wasInitialized) {
+      this.isInitialized = false;
+    }
+    
+    // 调用父类初始化（下载资源等）
     await super.initialize();
     
     if (this.audioFile) {
@@ -61,6 +77,10 @@ export class AudioVisualizerElement extends BaseElement {
       
       // 提取音频数据（会在 extractAudioData 中自动检测时长）
       await this.extractAudioData();
+      // 确保 isInitialized 在 audioData 准备好后才设置为 true
+      this.isInitialized = true;
+    } else {
+      // 如果没有 audioFile，也标记为已初始化
       this.isInitialized = true;
     }
   }
