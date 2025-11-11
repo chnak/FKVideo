@@ -34,6 +34,10 @@ export class AudioVisualizerElement extends BaseElement {
     this.maxBars = config.maxBars || 32;
     this.sensitivity = config.sensitivity || 1.0; // 灵敏度倍增器
     
+    // 网格线颜色配置（仅用于 waveform 类型）
+    this.gridColor = config.gridColor || 'rgba(0, 255, 0, 0.2)'; // 网格线颜色，默认淡绿色
+    this.centerLineColor = config.centerLineColor || 'rgba(0, 255, 0, 0.5)'; // 中心基准线颜色，默认绿色
+    
     // 音频数据缓存
     this.audioData = null; // 原始 PCM 数据
     this.spectrumData = null; // 频谱数据缓存
@@ -435,8 +439,8 @@ export class AudioVisualizerElement extends BaseElement {
       return;
     }
 
-    // 绘制示波器网格线（淡色）
-    ctx.strokeStyle = 'rgba(0, 255, 0, 0.2)';
+    // 绘制示波器网格线（使用配置的颜色）
+    ctx.strokeStyle = this.gridColor;
     ctx.lineWidth = 1;
     
     // 水平网格线
@@ -457,8 +461,8 @@ export class AudioVisualizerElement extends BaseElement {
       ctx.stroke();
     }
     
-    // 绘制中心基准线（更明显）
-    ctx.strokeStyle = 'rgba(0, 255, 0, 0.5)';
+    // 绘制中心基准线（使用配置的颜色）
+    ctx.strokeStyle = this.centerLineColor;
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(0, centerY);
