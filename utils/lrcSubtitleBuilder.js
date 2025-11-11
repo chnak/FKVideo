@@ -28,11 +28,92 @@ export class LRCSubtitleBuilder {
    * @returns {Array} 字幕元素配置数组
    */
   static loadFromContent(lrcContent, options = {}) {
-    // 使用 lrc-kit 解析 LRC 内容
+    // 先手动解析多时间标签格式（支持 [03:06.90][02:33.64][01:06.36]文本 这种格式）
+    const lyricsWithMultipleTimes = this.parseMultipleTimeTags(lrcContent);
+    
+    // 如果有多个时间标签的歌词，使用手动解析的结果
+    if (lyricsWithMultipleTimes.length > 0) {
+      return this.toSubtitleElements(lyricsWithMultipleTimes, options);
+    }
+    
+    // 否则使用 lrc-kit 解析标准 LRC 内容
     const parsedLrc = Lrc.parse(lrcContent);
     
     // 转换为字幕元素配置
     return this.toSubtitleElements(parsedLrc.lyrics, options);
+  }
+
+  /**
+   * 解析多时间标签格式的 LRC 内容
+   * 支持格式：[03:06.90][02:33.64][01:06.36]文本内容
+   * @param {string} lrcContent - LRC 文件内容
+   * @returns {Array} 歌词数组，格式: [{timestamp: 秒数, content: '歌词内容'}, ...]
+   */
+  static parseMultipleTimeTags(lrcContent) {
+    const lines = lrcContent.split(/\r?\n/);
+    const lyrics = [];
+    
+    // 匹配时间标签的正则表达式：[mm:ss.xx] 或 [m:ss.xx]
+    const timeTagRegex = /\[(\d{1,2}):(\d{2})\.(\d{2})\]/g;
+    
+    for (const line of lines) {
+      const trimmedLine = line.trim();
+      
+      // 跳过空行
+      if (!trimmedLine) {
+        continue;
+      }
+      
+      // 重置正则表达式
+      timeTagRegex.lastIndex = 0;
+      
+      // 检查是否是元数据行（如 [ar:艺术家]），元数据行不包含时间标签格式
+      // 先检查是否有时间标签格式
+      const hasTimeTag = timeTagRegex.test(trimmedLine);
+      timeTagRegex.lastIndex = 0; // 重置正则表达式
+      
+      // 如果是元数据行（以 [ 开头但不是时间标签），跳过
+      if (trimmedLine.startsWith('[') && !hasTimeTag) {
+        continue;
+      }
+      
+      // 提取所有时间标签
+      const timeTags = [];
+      let match;
+      while ((match = timeTagRegex.exec(trimmedLine)) !== null) {
+        const minutes = parseInt(match[1], 10);
+        const seconds = parseInt(match[2], 10);
+        const centiseconds = parseInt(match[3], 10);
+        const timestamp = minutes * 60 + seconds + centiseconds / 100;
+        timeTags.push(timestamp);
+      }
+      
+      // 如果没有找到时间标签，跳过这一行
+      if (timeTags.length === 0) {
+        continue;
+      }
+      
+      // 提取文本内容（移除所有时间标签后剩余的部分）
+      const text = trimmedLine.replace(timeTagRegex, '').trim();
+      
+      // 如果文本为空，跳过
+      if (!text) {
+        continue;
+      }
+      
+      // 为每个时间标签创建一个歌词条目
+      for (const timestamp of timeTags) {
+        lyrics.push({
+          timestamp: timestamp,
+          content: text
+        });
+      }
+    }
+    
+    // 按时间戳排序
+    lyrics.sort((a, b) => a.timestamp - b.timestamp);
+    
+    return lyrics;
   }
 
   /**
