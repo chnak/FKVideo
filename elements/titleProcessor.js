@@ -499,17 +499,29 @@ export async function createTitleElement(config) {
         }, true); // 标记为分割文本
         
         // 计算文本的起始位置（左上角）
-        // 根据 textAlign 调整起始位置
+        // positionProps.left 已经是考虑了 x、y、position 后的左上角位置
+        // textAlign 的作用是在文本宽度内对齐，但这里我们需要在整个画布宽度内对齐
+        // 所以需要根据 textAlign 重新计算位置
         let currentX = positionProps.left;
         let currentY = positionProps.top;
-        //console.log('width',width,'positionProps.left',positionProps.left,'totalWidth',totalWidth,'charSpacing',charSpacing)
+        
         const mainCanvas = createFabricCanvas({ width, height });
+        
+        // 根据 textAlign 调整起始位置
+        // 注意：这里 textAlign 是在整个画布宽度内对齐，而不是在 positionProps.left 的基础上对齐
+        // 如果需要在 positionProps.left 的基础上对齐，应该使用不同的逻辑
         if (textAlign === 'center') {
-          currentX = (width-totalWidth)/2 + charSpacing*textSegments.length;
+          // 在整个画布宽度内居中
+          currentX = (width - totalWidth) / 2;
         } else if (textAlign === 'right') {
-          currentX = Math.floor((width-totalWidth));
-        }else if (textAlign === 'left') {
+          // 在整个画布宽度内右对齐
+          currentX = width - totalWidth;
+        } else if (textAlign === 'left') {
+          // 在整个画布宽度内左对齐
           currentX = charSpacing*textSegments.length;
+        } else {
+          // 如果没有设置 textAlign 或为其他值，使用 positionProps.left
+          currentX = positionProps.left;
         }
         //console.log('width',width,'canvasWidth',canvas.width,positionProps)
         // if(text.includes('开始渲染')||text.includes('字幕')){
