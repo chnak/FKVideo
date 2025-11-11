@@ -1229,6 +1229,7 @@ export class MultiTrackBuilder {
     }));
 
     return {
+      ...this.config,
       outPath: this.config.outPath,
       width: this.config.width,
       height: this.config.height,

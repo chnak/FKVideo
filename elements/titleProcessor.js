@@ -490,8 +490,8 @@ export async function createTitleElement(config) {
           position,
           x,
           y,
-          originX,
-          originY,
+          originX:'left',
+          originY:'top',
           width,
           height,
           textWidth: totalWidth,
@@ -505,10 +505,13 @@ export async function createTitleElement(config) {
         //console.log('width',width,'positionProps.left',positionProps.left,'totalWidth',totalWidth,'charSpacing',charSpacing)
         const mainCanvas = createFabricCanvas({ width, height });
         if (textAlign === 'center') {
-          currentX +=charSpacing*textSegments.length;
+          currentX = (width-totalWidth)/2 + charSpacing*textSegments.length;
         } else if (textAlign === 'right') {
-          currentX += positionProps.left;
+          currentX = Math.floor((width-totalWidth));
+        }else if (textAlign === 'left') {
+          currentX = charSpacing*textSegments.length;
         }
+        //console.log('width',width,'canvasWidth',canvas.width,positionProps)
         // if(text.includes('开始渲染')||text.includes('字幕')){
         //   console.log(text,currentX,'==',charSpacing*textSegments.length)
         // }

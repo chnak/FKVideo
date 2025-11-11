@@ -38,22 +38,32 @@ export class Timeline {
     }
 
     // 按层级顺序渲染元素
+    // 注意：虽然元素需要按层级顺序添加到画布，但可以并行计算帧数据
     const activeElements = this.getActiveElementsAtTime(time);
     
-    for (const element of activeElements) {
+    // 优化：并行获取所有元素的帧数据，然后按顺序添加到画布
+    const frameDataPromises = activeElements.map(async (element) => {
       try {
         const progress = element.getProgressAtTime(time);
         const frameData = await element.readNextFrame(time, canvas);
-        if (frameData) {
-          // 将帧数据添加到画布
-          await this.addFrameToCanvas(canvas, frameData, element);
-        }
+        return { element, frameData, error: null };
       } catch (error) {
         console.warn(`渲染元素失败: ${element.type}`, error);
         // 对于关键错误（如文件不存在），抛出异常以停止渲染
         if (error.message.includes('Command failed') || error.message.includes('ENOENT')) {
           throw error;
         }
+        return { element, frameData: null, error };
+      }
+    });
+    
+    // 并行获取所有帧数据
+    const frameResults = await Promise.all(frameDataPromises);
+    
+    // 按顺序添加到画布（保持层级顺序）
+    for (const { element, frameData, error } of frameResults) {
+      if (frameData && !error) {
+        await this.addFrameToCanvas(canvas, frameData, element);
       }
     }
 

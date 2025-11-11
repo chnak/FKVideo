@@ -23,8 +23,12 @@ export class VideoMaker extends EventEmitter {
       // 渲染设置
       verbose: config.verbose || false,
       fast: config.fast || false,
+      preset: config.preset, // FFmpeg 编码预设：ultrafast, superfast, veryfast, faster, fast, medium, slow, slower, veryslow
+      crf: config.crf, // 视频质量：18-28，数值越大质量越低但速度越快（fast 模式下默认 28，否则 23）
       outPath: config.outPath || 'output.mp4',
       playbackSpeed: config.playbackSpeed || 1.0, // 倍速播放，默认1.0倍速
+      // 并行渲染配置
+      parallel: config.parallel || null, // { enabled: true, segmentDuration: 10, maxConcurrent: 4 }
       tmpDir: null,
       // Creatomate 风格的元素配置
       elements: config.elements || [],
