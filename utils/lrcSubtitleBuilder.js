@@ -130,7 +130,9 @@ export class LRCSubtitleBuilder {
       y = '80%',
       textAlign = 'center',
       minDuration = 1, // 最小显示时长
-      maxDuration = 5.0  // 最大显示时长
+      maxDuration = 5.0,  // 最大显示时长
+      sceneDuration = null, // 场景或轨道时长，用于计算最后一句歌词的显示时长
+      lastLineDuration = null // 最后一句歌词的显示时长（如果指定，优先使用）
     } = options;
 
     const elements = [];
@@ -151,8 +153,19 @@ export class LRCSubtitleBuilder {
           )
         );
       } else {
-        // 最后一句，使用最小时长或默认时长
-        duration = Math.max(minDuration, 3);
+        // 最后一句歌词的时长计算
+        if (lastLineDuration !== null && lastLineDuration !== undefined) {
+          // 如果明确指定了最后一句的时长，使用指定值
+          duration = Math.max(minDuration, lastLineDuration);
+        } else if (sceneDuration !== null && sceneDuration !== undefined && sceneDuration > 0) {
+          // 如果提供了场景/轨道时长，最后一句显示到场景/轨道结束
+          // 计算从最后一句开始到场景结束的时长
+          const timeToEnd = sceneDuration - lyric.timestamp;
+          duration = Math.max(minDuration, timeToEnd);
+        } else {
+          // 否则使用默认时长（3秒或最小时长）
+          duration = Math.max(minDuration, 3);
+        }
       }
       
       elements.push({
@@ -184,7 +197,14 @@ export class LRCSubtitleBuilder {
       throw new Error(`LRC 文件不存在: ${lrcPath}`);
     }
 
-    const subtitleElements = this.loadFromFile(lrcPath, options);
+    // 获取场景或轨道的时长，用于计算最后一句歌词的显示时长
+    const sceneOrTrackDuration = sceneOrTrack.duration;
+    
+    // 将场景/轨道时长传递给 options，用于计算最后一句歌词的时长
+    const subtitleElements = this.loadFromFile(lrcPath, {
+      ...options,
+      sceneDuration: sceneOrTrackDuration // 传递场景/轨道时长
+    });
     
     // 将字幕元素添加到场景或轨道
     for (const subtitleConfig of subtitleElements) {
